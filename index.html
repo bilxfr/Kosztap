@@ -142,11 +142,11 @@
                         <i class="fa-solid fa-folder-plus text-purple-400"></i>
                         <span class="hidden sm:inline">+ Własna tabela</span>
                     </button>
-                    <button onclick="openReceiptScannerModal()" class="mat-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs shadow-md shadow-amber-500/20" title="Zeskanuj paragon aparatem">
+                    <button type="button" onclick="openReceiptScannerModal()" class="mat-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs shadow-md shadow-amber-500/20 cursor-pointer" title="Zeskanuj paragon aparatem">
                         <i class="fa-solid fa-camera"></i>
                         <span>Skanuj paragon</span>
                     </button>
-                    <button onclick="openEntryModal()" class="mat-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20">
+                    <button type="button" onclick="openEntryModal()" class="mat-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20">
                         <i class="fa-solid fa-plus"></i>
                         <span>Dodaj wpis</span>
                     </button>
@@ -632,10 +632,10 @@
     </main>
 
     <!-- FLOATING ACTION BUTTONS (MOBILE: CAMERA + ADD) -->
-    <button onclick="openReceiptScannerModal()" aria-label="Zeskanuj paragon aparatem" class="md:hidden fixed right-4 bottom-36 z-30 w-14 h-14 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-xl shadow-amber-500/30 flex items-center justify-center text-xl mat-btn border-2 border-white" title="Skanuj paragon">
+    <button type="button" onclick="openReceiptScannerModal()" aria-label="Zeskanuj paragon aparatem" class="md:hidden fixed right-4 bottom-36 z-30 w-14 h-14 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-xl shadow-amber-500/30 flex items-center justify-center text-xl mat-btn border-2 border-white cursor-pointer" title="Skanuj paragon">
         <i class="fa-solid fa-camera"></i>
     </button>
-    <button onclick="openEntryModal()" aria-label="Dodaj nową pozycję" class="md:hidden fixed right-4 bottom-20 z-30 w-14 h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-xl shadow-emerald-600/30 flex items-center justify-center text-xl mat-btn border-2 border-white">
+    <button type="button" onclick="openEntryModal()" aria-label="Dodaj nową pozycję" class="md:hidden fixed right-4 bottom-20 z-30 w-14 h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-xl shadow-emerald-600/30 flex items-center justify-center text-xl mat-btn border-2 border-white">
         <i class="fa-solid fa-plus"></i>
     </button>
 
@@ -985,23 +985,23 @@
                     </div>
                 </div>
 
-                <!-- Hidden File Inputs for Native Camera & Gallery -->
-                <input type="file" id="receiptCameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptFileSelect(event)">
-                <input type="file" id="receiptGalleryInput" accept="image/*" class="hidden" onchange="handleReceiptFileSelect(event)">
+                <!-- Native File Inputs for Camera & Gallery (using sr-only + label for 100% Android compatibility) -->
+                <input type="file" id="receiptCameraInput" accept="image/*" capture="environment" class="sr-only" onchange="handleReceiptFileSelect(event)">
+                <input type="file" id="receiptGalleryInput" accept="image/*" class="sr-only" onchange="handleReceiptFileSelect(event)">
 
                 <!-- Capture Action Buttons -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    <button type="button" onclick="document.getElementById('receiptCameraInput').click()" class="mat-btn py-3 px-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold flex items-center justify-center gap-2 shadow-md shadow-amber-500/15">
+                    <label for="receiptCameraInput" class="mat-btn py-3.5 px-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold flex items-center justify-center gap-2 shadow-md shadow-amber-500/15 cursor-pointer select-none">
                         <i class="fa-solid fa-camera text-base"></i>
                         <span>Aparat (Zrób zdjęcie)</span>
-                    </button>
+                    </label>
 
-                    <button type="button" onclick="document.getElementById('receiptGalleryInput').click()" class="mat-btn py-3 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold flex items-center justify-center gap-2 border border-slate-300">
+                    <label for="receiptGalleryInput" class="mat-btn py-3.5 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold flex items-center justify-center gap-2 border border-slate-300 cursor-pointer select-none">
                         <i class="fa-regular fa-image text-base text-blue-600"></i>
                         <span>Wybierz z galerii</span>
-                    </button>
+                    </label>
 
-                    <button type="button" onclick="startLiveCameraStream()" id="btnStartLiveCam" class="mat-btn py-3 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold flex items-center justify-center gap-2 border border-slate-300">
+                    <button type="button" onclick="startLiveCameraStream()" id="btnStartLiveCam" class="mat-btn py-3.5 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold flex items-center justify-center gap-2 border border-slate-300 cursor-pointer">
                         <i class="fa-solid fa-video text-base text-emerald-600"></i>
                         <span>Kamera na żywo</span>
                     </button>
@@ -2655,7 +2655,9 @@
                 }
 
                 if ('serviceWorker' in navigator && !isLocalFile) {
-                    navigator.serviceWorker.register('./sw.js').catch((err) => {
+                    navigator.serviceWorker.register('./sw.js').then((reg) => {
+                        reg.update();
+                    }).catch((err) => {
                         console.warn('SW registration warning:', err);
                     });
                 }
@@ -2727,22 +2729,24 @@
             if (keyInput) keyInput.value = savedKey;
             updateAiKeyBadge();
 
-            // Set default date to today if in selected month, or 15th of selected month
             const now = new Date();
-            let defaultDate = getSelectedMonthDefaultDateStr(String(now.getDate()).padStart(2, '0'));
-            document.getElementById('scannedDateInput').value = defaultDate;
+            const defaultDate = getSelectedMonthDefaultDateStr(String(now.getDate()).padStart(2, '0'));
+            const dateInput = document.getElementById('scannedDateInput');
+            if (dateInput) dateInput.value = defaultDate;
 
-            document.getElementById('receiptScannerModal').classList.remove('hidden');
+            const modal = document.getElementById('receiptScannerModal');
+            if (modal) modal.classList.remove('hidden');
         }
 
         function closeReceiptScannerModal() {
             stopLiveCameraStream();
-            document.getElementById('receiptScannerModal').classList.add('hidden');
+            const modal = document.getElementById('receiptScannerModal');
+            if (modal) modal.classList.add('hidden');
         }
 
         function toggleScannerAiSettings() {
             const box = document.getElementById('scannerAiSettingsBox');
-            box.classList.toggle('hidden');
+            if (box) box.classList.toggle('hidden');
         }
 
         function updateAiKeyBadge() {
@@ -2776,7 +2780,7 @@
             const video = document.getElementById('liveCameraVideo');
             try {
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    showToast('Użyj przycisku „Aparat (Zrób zdjęcie)” powyżej', 'info');
+                    showToast('Twoja przeglądarka otworzy standardowy aparat', 'info');
                     document.getElementById('receiptCameraInput').click();
                     return;
                 }
@@ -2792,6 +2796,7 @@
                 container.classList.remove('hidden');
             } catch (err) {
                 console.warn('Camera stream fallback:', err);
+                showToast('Otwieranie natywnego aparatu telefonu...', 'info');
                 document.getElementById('receiptCameraInput').click();
             }
         }
@@ -2830,7 +2835,6 @@
             event.target.value = '';
         }
 
-        // Preprocesses receipt photo (resizes + increases contrast for crisp OCR on thermal paper)
         function preprocessReceiptImage(dataUrl) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -2853,7 +2857,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
 
-                    // Enhance contrast & convert to clean high-contrast grayscale for Tesseract
                     const imgData = ctx.getImageData(0, 0, w, h);
                     const d = imgData.data;
                     const contrast = 1.45;
@@ -2891,7 +2894,6 @@
                 if (aiSuccess) return;
             }
 
-            // Default: Local in-browser OCR via Tesseract.js (Polish + English)
             try {
                 const processedDataUrl = await preprocessReceiptImage(rawDataUrl);
                 setScanProgress(20, '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Uruchamianie silnika OCR (Polski)...', 'Pobieranie słownika i odczyt tekstu...');
@@ -2981,14 +2983,11 @@
             }
         }
 
-        // Intelligent Polish Fiscal Receipt Parser
         function parsePolishReceiptText(rawText) {
             const text = String(rawText || '');
             const lower = text.toLowerCase();
-            const lines = text.split(/?
-/).map(l => l.trim()).filter(Boolean);
+            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
-            // 1. Detect Store Name & Category
             let detectedStore = 'Zakupy z paragonu';
             let detectedCategory = 'food';
             for (const store of POLISH_STORES_DB) {
@@ -2999,25 +2998,22 @@
                 }
             }
 
-            // 2. Detect Receipt Date (YYYY-MM-DD or DD-MM-YYYY or DD.MM.YYYY)
             let detectedDate = '';
-            const isoMatch = text.match(/(202[4-9])[-./](0[1-9]|1[0-2])[-./](0[1-9]|[12]\d|3[01])/);
-            const dmyMatch = text.match(/(0[1-9]|[12]\d|3[01])[-./](0[1-9]|1[0-2])[-./](202[4-9])/);
+            const isoMatch = text.match(/\b(202[4-9])[-./](0[1-9]|1[0-2])[-./](0[1-9]|[12]\d|3[01])\b/);
+            const dmyMatch = text.match(/\b(0[1-9]|[12]\d|3[01])[-./](0[1-9]|1[0-2])[-./](202[4-9])\b/);
             if (isoMatch) {
                 detectedDate = `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
             } else if (dmyMatch) {
                 detectedDate = `${dmyMatch[3]}-${dmyMatch[2]}-${dmyMatch[1]}`;
             }
 
-            // 3. Extract Total Amount (SUMA PLN / DO ZAPŁATY / RAZEM / KWOTA)
             const totalKeywords = ['suma pln', 'suma:', 'suma ', 'do zapłaty', 'do zaplaty', 'razem', 'wartość', 'wartosc', 'płatność', 'platnosc', 'karta', 'gotówka', 'gotowka'];
             let primaryTotal = null;
             const allAmountsSet = new Set();
 
-            // Helper to extract decimal prices like 12,99 or 145.50 from a line
             const extractPricesFromLine = (line) => {
-                const normalized = line.replace(/(\d)\s+[,.]\s*(\d{2})/g, '$1,$2');
-                const matches = [...normalized.matchAll(/(\d{1,5})[,.](\d{2})/g)];
+                const normalized = line.replace(/(\d)\s+[,.]\s*(\d{2})\b/g, '$1,$2');
+                const matches = [...normalized.matchAll(/\b(\d{1,5})[,.](\d{2})\b/g)];
                 return matches.map(m => parseFloat(`${m[1]}.${m[2]}`)).filter(v => v > 0 && v < 50000 && ![2024, 2025, 2026, 2027, 23.00, 8.00, 5.00].includes(v));
             };
 
@@ -3029,7 +3025,6 @@
                 const prices = extractPricesFromLine(line);
                 prices.forEach(p => allAmountsSet.add(p.toFixed(2)));
 
-                // Check if this line is the SUMA PLN line
                 if (totalKeywords.some(kw => lLow.includes(kw))) {
                     if (prices.length > 0 && primaryTotal === null) {
                         primaryTotal = Math.max(...prices);
@@ -3038,8 +3033,7 @@
                         if (nextPrices.length > 0) primaryTotal = Math.max(...nextPrices);
                     }
                 } else if (prices.length > 0) {
-                    // Check if it looks like a product line item (has letters and ends with a price)
-                    const cleanName = line.replace(/\d+[,.]\d{2}.*$/, '').replace(/[*xX]\s*\d+([,.]\d+)?.*$/, '').trim();
+                    const cleanName = line.replace(/\b\d+[,.]\d{2}\b.*$/, '').replace(/[*xX]\s*\d+([,.]\d+)?.*$/, '').trim();
                     const ignoreWords = ['ptu', 'podatek', 'vat', 'sprzedaż', 'sprzedaz', 'opodatkowana', 'reszta', 'nip', 'paragon', 'fiskalny', 'kasjer', 'nr ', 'kasa'];
                     if (cleanName.length >= 3 && !ignoreWords.some(w => cleanName.toLowerCase().includes(w))) {
                         const itemPrice = prices[prices.length - 1];
@@ -3078,7 +3072,6 @@
 
             document.getElementById('rawOcrTextOutput').textContent = rawText || 'Brak surowego tekstu.';
 
-            // Render clickable chips of other detected numbers on the receipt
             const chipsBox = document.getElementById('otherDetectedAmountsBox');
             const chipsContainer = document.getElementById('otherDetectedAmountsChips');
             if (parsed.otherAmounts && parsed.otherAmounts.length > 0) {
@@ -3091,7 +3084,6 @@
                 chipsBox.classList.add('hidden');
             }
 
-            // Populate multi-items checklist if line items were detected
             currentDetectedLineItems = parsed.items || [];
             const modeWrapper = document.getElementById('scanImportModeWrapper');
             const countSpan = document.getElementById('detectedItemsCount');
@@ -3141,7 +3133,6 @@
             const categoryId = document.getElementById('scannedCategorySelect').value || 'food';
             const dateVal = document.getElementById('scannedDateInput').value || getSelectedMonthDefaultDateStr('15');
 
-            // Automatically switch selected month/year to the receipt's date so the user immediately sees the added entry
             if (dateVal && dateVal.includes('-')) {
                 const parts = dateVal.split('-');
                 const rYear = parseInt(parts[0], 10);
@@ -3186,7 +3177,6 @@
                 return;
             }
 
-            // Single total receipt mode
             const amount = parseFloat(document.getElementById('scannedAmountInput').value);
             const name = document.getElementById('scannedNameInput').value.trim() || 'Zakupy z paragonu';
 

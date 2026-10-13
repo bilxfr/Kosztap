@@ -1,4 +1,4 @@
-const CACHE_NAME = 'koszty-zycia-pwa-v3';
+const CACHE_NAME = 'koszty-zycia-pwa-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -24,6 +24,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html')))
+    fetch(event.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html')))
   );
 });
