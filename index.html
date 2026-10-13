@@ -1,0 +1,3226 @@
+<!DOCTYPE html>
+<html lang="pl" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Koszty Życia">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAgMAAAAvsoSUAAAACVBMVEX///8QuYEPFyrg0RqAAAABTklEQVR42u3ZUQ6DIAwG4MbHHWX3wQeO4Cl2CY9AIjvllmUaZNT2VzFmlme+UNAobekJDjJgwICBDSC6wvA8KM7PxAw4ZnQMCBxoGeCcYglSLDBbgjQLpEuQdET5QZEmojQmUkWUxESqiJKYSBVREtME+mXgfoAwf9rEahAl4DMQJNBmQNrztOvVQJw/7notiDLw20CQQbsNyKc6nuthQDH/+yBOC6IGeAPZ9y0d/QLwJRAXQFf8l/OgLf/8w37Al0FkQcdcSPYD3JWnN2DAwFUB3TAwUIOBB9G9LiD6bEINhjdoDOx9rAc8afjlg19v+2oYMHAtUP/uDacD9TMUOGnC0zI48TtR8voPZYozVn/ql7zql+3qlx4PKJ/CFV24Zly/jI1X1uHaPdwdgPsPeIcD7qHAXRq8DwR3mvBeFtwtw/txcMfPGqkGDBgQxwtrT3s7wXpxVgAAAABJRU5ErkJggg==">
+    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAgMAAAAvsoSUAAAACVBMVEX///8QuYEPFyrg0RqAAAABTklEQVR42u3ZUQ6DIAwG4MbHHWX3wQeO4Cl2CY9AIjvllmUaZNT2VzFmlme+UNAobekJDjJgwICBDSC6wvA8KM7PxAw4ZnQMCBxoGeCcYglSLDBbgjQLpEuQdET5QZEmojQmUkWUxESqiJKYSBVREtME+mXgfoAwf9rEahAl4DMQJNBmQNrztOvVQJw/7notiDLw20CQQbsNyKc6nuthQDH/+yBOC6IGeAPZ9y0d/QLwJRAXQFf8l/OgLf/8w37Al0FkQcdcSPYD3JWnN2DAwFUB3TAwUIOBB9G9LiD6bEINhjdoDOx9rAc8afjlg19v+2oYMHAtUP/uDacD9TMUOGnC0zI48TtR8voPZYozVn/ql7zql+3qlx4PKJ/CFV24Zly/jI1X1uHaPdwdgPsPeIcD7qHAXRq8DwR3mvBeFtwtw/txcMfPGqkGDBgQxwtrT3s7wXpxVgAAAABJRU5ErkJggg==">
+    <title>Kalkulator Kosztów Życia – PWA</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tesseract.js OCR Engine for Receipt Scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        android: {
+                            bg: '#f1f5f9',
+                            surface: '#ffffff',
+                            primary: '#2563eb',
+                            income: '#10b981',
+                            expense: '#ef4444',
+                            food: '#f59e0b',
+                            home: '#6366f1',
+                            custom: '#8b5cf6'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            overscroll-behavior-y: none;
+        }
+        .font-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        /* Custom smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Material elevation and ripple feel */
+        .mat-card {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .mat-btn {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mat-btn:active {
+            transform: scale(0.96);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        /* Safe bottom padding for mobile nav + FAB */
+        .pb-safe-nav {
+            padding-bottom: 6.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col bg-slate-100 text-slate-900 selection:bg-blue-600 selection:text-white">
+
+    <!-- TOP STICKY ANDROID APP BAR & MONTH/YEAR SELECTOR -->
+    <header class="sticky top-0 z-30 bg-slate-900 text-white shadow-lg border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5">
+            <!-- Top Row: Title + Quick Actions -->
+            <div class="flex items-center justify-between gap-2 mb-2.5">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+                        <i class="fa-solid fa-wallet text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-extrabold text-base sm:text-lg tracking-tight leading-none">Kalkulator Kosztów Życia</h1>
+                            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PWA Android</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Domowy budżet: zyski, jedzenie, dom i plany okresowe</p>
+                    </div>
+                </div>
+
+                <!-- Right quick utilities -->
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <button onclick="openPwaModal()" class="mat-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-600/25 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 text-xs font-semibold" title="Zainstaluj na telefonie">
+                        <i class="fa-brands fa-android text-emerald-400 text-sm"></i>
+                        <span class="hidden md:inline">Zainstaluj na telefonie</span>
+                    </button>
+                    <button onclick="openCategoryModal()" class="mat-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold" title="Nowa własna tabela / kategoria">
+                        <i class="fa-solid fa-folder-plus text-purple-400"></i>
+                        <span class="hidden sm:inline">+ Własna tabela</span>
+                    </button>
+                    <button onclick="openReceiptScannerModal()" class="mat-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs shadow-md shadow-amber-500/20" title="Zeskanuj paragon aparatem">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>Skanuj paragon</span>
+                    </button>
+                    <button onclick="openEntryModal()" class="mat-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Dodaj wpis</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Period Selector (Month + Year + Arrows) -->
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-800/90 rounded-2xl p-1.5 border border-slate-700/80">
+                <div class="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                    <button onclick="changeMonth(-1)" class="mat-btn w-9 h-9 rounded-xl bg-slate-700/80 hover:bg-slate-600 flex items-center justify-center text-white shadow-sm" title="Poprzedni miesiąc">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+
+                    <div class="flex items-center gap-1.5">
+                        <!-- Month Select -->
+                        <div class="relative">
+                            <select id="selectMonth" onchange="onPeriodChange()" aria-label="Wybierz miesiąc" class="appearance-none bg-slate-900 hover:bg-slate-950 text-white font-bold text-xs sm:text-sm rounded-xl pl-3 pr-8 py-2 border border-slate-700 focus:outline-none focus:border-blue-500 cursor-pointer">
+                                <option value="0">Styczeń</option>
+                                <option value="1">Luty</option>
+                                <option value="2">Marzec</option>
+                                <option value="3">Kwiecień</option>
+                                <option value="4">Maj</option>
+                                <option value="5">Czerwiec</option>
+                                <option value="6">Lipiec</option>
+                                <option value="7">Sierpień</option>
+                                <option value="8">Wrzesień</option>
+                                <option value="9">Październik</option>
+                                <option value="10">Listopad</option>
+                                <option value="11">Grudzień</option>
+                            </select>
+                            <i class="fa-solid fa-calendar-day text-blue-400 text-xs absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
+
+                        <!-- Year Select -->
+                        <div class="relative">
+                            <select id="selectYear" onchange="onPeriodChange()" aria-label="Wybierz rok" class="appearance-none bg-slate-900 hover:bg-slate-950 text-white font-bold font-num text-xs sm:text-sm rounded-xl pl-3 pr-7 py-2 border border-slate-700 focus:outline-none focus:border-blue-500 cursor-pointer">
+                                <!-- Populated via JS (2024 - 2032) -->
+                            </select>
+                            <i class="fa-solid fa-caret-down text-slate-400 text-xs absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <button onclick="changeMonth(1)" class="mat-btn w-9 h-9 rounded-xl bg-slate-700/80 hover:bg-slate-600 flex items-center justify-center text-white shadow-sm" title="Następny miesiąc">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Period Status & Expired Filter Toggle -->
+                <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-1 sm:pt-0 border-t border-slate-700/60 sm:border-0 px-1">
+                    <button onclick="resetToDefaultPeriod()" class="text-[11px] font-medium text-slate-300 hover:text-white flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-slate-700/60">
+                        <i class="fa-solid fa-clock-rotate-left text-blue-400"></i>
+                        <span>Bieżący (Paź 2026)</span>
+                    </button>
+
+                    <label class="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer select-none bg-slate-900/70 px-2.5 py-1 rounded-lg border border-slate-700">
+                        <input type="checkbox" id="toggleShowInactive" onchange="renderAll()" class="rounded text-blue-500 focus:ring-0 w-3.5 h-3.5 accent-blue-500">
+                        <span>Pokaż wygasłe / z innych mies.</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 pb-safe-nav">
+
+        <!-- TOP SUMMARY DASHBOARD (ALWAYS VISIBLE OR COMPACT) -->
+        <section aria-label="Podsumowanie budżetu" class="mb-5">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+
+                <!-- CARD 1: BILANS MIESIĄCA (NETTO) -->
+                <div id="monthlyBalanceCard" class="md:col-span-5 rounded-3xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden transition-colors duration-300 bg-gradient-to-br from-emerald-600 to-teal-800">
+                    <div class="relative z-10 flex flex-col justify-between h-full">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <span id="dashboardPeriodLabel" class="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm mb-1">
+                                    PAŹDZIERNIK 2026
+                                </span>
+                                <h2 class="text-sm font-semibold text-white/90">Bilans wybranego miesiąca</h2>
+                            </div>
+                            <span id="monthlyStatusBadge" class="px-2.5 py-1 rounded-xl text-xs font-extrabold uppercase tracking-wide bg-white/20 backdrop-blur-sm">
+                                ZYSK NETTO
+                            </span>
+                        </div>
+
+                        <div class="my-3">
+                            <div id="monthlyNetValue" class="text-3xl sm:text-4xl font-extrabold font-num tracking-tight">
+                                +0,00 zł
+                            </div>
+                            <p id="monthlySavingsRate" class="text-xs text-white/85 mt-1 font-medium">
+                                Stopa oszczędności: 0% przychodów
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5 pt-3 border-t border-white/20">
+                            <div class="bg-black/15 rounded-2xl p-2.5">
+                                <div class="flex items-center gap-1.5 text-[11px] text-emerald-100 font-medium">
+                                    <i class="fa-solid fa-arrow-trend-up"></i>
+                                    <span>Zyski w miesiącu</span>
+                                </div>
+                                <div id="monthlyIncomeValue" class="text-sm sm:text-base font-bold font-num mt-0.5 text-white">
+                                    +0,00 zł
+                                </div>
+                            </div>
+                            <div class="bg-black/15 rounded-2xl p-2.5">
+                                <div class="flex items-center gap-1.5 text-[11px] text-rose-100 font-medium">
+                                    <i class="fa-solid fa-arrow-trend-down"></i>
+                                    <span>Koszty w miesiącu</span>
+                                </div>
+                                <div id="monthlyExpenseValue" class="text-sm sm:text-base font-bold font-num mt-0.5 text-white">
+                                    -0,00 zł
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Decorative background icon -->
+                    <i class="fa-solid fa-scale-balanced absolute -right-4 -bottom-4 text-8xl text-white/10 pointer-events-none"></i>
+                </div>
+
+                <!-- CARD 2: STRUKTURA KOSZTÓW W MIESIĄCU (JEDZENIE, DOM, INNE) -->
+                <div class="md:col-span-4 mat-card p-4 sm:p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Struktura kosztów (Miesiąc)</h2>
+                            <span id="activeItemsCountBadge" class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">0 aktywnych pozycji</span>
+                        </div>
+
+                        <!-- Stacked Progress Bar -->
+                        <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex my-2.5 p-0.5 gap-0.5 border border-slate-200">
+                            <div id="barFood" class="bg-amber-500 h-full rounded-l-full transition-all duration-300" style="width: 33%"></div>
+                            <div id="barHome" class="bg-indigo-500 h-full transition-all duration-300" style="width: 33%"></div>
+                            <div id="barOther" class="bg-purple-500 h-full rounded-r-full transition-all duration-300" style="width: 34%"></div>
+                        </div>
+
+                        <!-- Breakdown list -->
+                        <div class="space-y-2 mt-3">
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                                    <span class="font-semibold text-slate-700">Jedzenie</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="pctFood" class="text-[11px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">0%</span>
+                                    <span id="valFood" class="font-bold font-num text-slate-800">0,00 zł</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span>
+                                    <span class="font-semibold text-slate-700">Koszty domu</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="pctHome" class="text-[11px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">0%</span>
+                                    <span id="valHome" class="font-bold font-num text-slate-800">0,00 zł</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block"></span>
+                                    <span class="font-semibold text-slate-700">Dodatkowe / Inne (-)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="pctOther" class="text-[11px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">0%</span>
+                                    <span id="valOther" class="font-bold font-num text-slate-800">0,00 zł</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                        <span>Wygasłe / zakończone w tym mies.:</span>
+                        <span id="expiredCountLabel" class="font-bold text-slate-700">0 pozycji</span>
+                    </div>
+                </div>
+
+                <!-- CARD 3: SZYBKI PODGLĄD BILANSU ROCZNEGO -->
+                <div class="md:col-span-3 mat-card p-4 sm:p-5 bg-gradient-to-b from-slate-900 to-slate-800 text-white border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-blue-400">Zestawienie Roczne</span>
+                            <span id="annualYearBadge" class="text-xs font-extrabold font-num bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-lg border border-blue-500/30">2026</span>
+                        </div>
+                        <h3 class="text-xs text-slate-300 mt-1">Wynik netto całego roku:</h3>
+                        <div id="annualNetValue" class="text-xl sm:text-2xl font-extrabold font-num mt-1 text-emerald-400">
+                            +0,00 zł
+                        </div>
+
+                        <div class="space-y-1.5 mt-3 pt-3 border-t border-slate-700/80 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Zyski w roku:</span>
+                                <span id="annualIncomeValue" class="font-bold font-num text-emerald-400">+0,00 zł</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Koszty w roku:</span>
+                                <span id="annualExpenseValue" class="font-bold font-num text-rose-400">-0,00 zł</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="switchTab('annual')" class="mat-btn mt-3 w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-table-list"></i>
+                        <span>Pełna tabela 12 miesięcy</span>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- NAVIGATION TABS (Visible on Desktop & Tablet, synced with Mobile Bottom Bar) -->
+        <div class="flex items-center justify-between gap-2 mb-4 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200/80 overflow-x-auto">
+            <div class="flex items-center gap-1">
+                <button onclick="switchTab('tables')" id="tabBtn-tables" class="mat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-slate-900 text-white shadow-sm">
+                    <i class="fa-solid fa-layer-group text-emerald-400"></i>
+                    <span>Tabele Miesiąca (Zyski i Koszty)</span>
+                </button>
+                <button onclick="switchTab('annual')" id="tabBtn-annual" class="mat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-calendar-check text-blue-500"></i>
+                    <span>Zestawienie Roczne i Wykresy</span>
+                </button>
+                <button onclick="switchTab('settings')" id="tabBtn-settings" class="mat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-database text-purple-500"></i>
+                    <span>Kopia Danych i PWA</span>
+                </button>
+            </div>
+
+            <!-- Quick Legend for Recurrence Badges -->
+            <div class="hidden lg:flex items-center gap-2 pr-2 text-[11px] text-slate-500">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-medium"><i class="fa-solid fa-rotate"></i> Stałe</span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 font-medium"><i class="fa-solid fa-bullseye"></i> Jednorazowe</span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 font-medium"><i class="fa-solid fa-hourglass-half"></i> Do określonej daty</span>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: TABELE MIESIĄCA (ZYSKI, JEDZENIE, DOM, DODATKOWE/WŁASNE) -->
+        <!-- ========================================== -->
+        <div id="view-tables" class="space-y-5">
+
+            <!-- Quick Category Jump Chips on Mobile -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <a href="#section-income" class="shrink-0 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1.5 border border-emerald-200">
+                    <i class="fa-solid fa-circle-plus text-emerald-600"></i> Zyski (+)
+                </a>
+                <a href="#section-food" class="shrink-0 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 font-bold text-xs flex items-center gap-1.5 border border-amber-200">
+                    <i class="fa-solid fa-utensils text-amber-600"></i> Jedzenie (-)
+                </a>
+                <a href="#section-home" class="shrink-0 px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-800 font-bold text-xs flex items-center gap-1.5 border border-indigo-200">
+                    <i class="fa-solid fa-house-chimney text-indigo-600"></i> Dom (-)
+                </a>
+                <a href="#section-custom" class="shrink-0 px-3 py-1.5 rounded-full bg-purple-100 text-purple-800 font-bold text-xs flex items-center gap-1.5 border border-purple-200">
+                    <i class="fa-solid fa-sliders text-purple-600"></i> Dodatkowe (+/-)
+                </a>
+                <button onclick="openCategoryModal()" class="shrink-0 px-3 py-1.5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Nowa tabela
+                </button>
+            </div>
+
+            <!-- Dynamic Tables Container rendered by JS -->
+            <div id="tablesContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <!-- Populated dynamically by renderTables() -->
+            </div>
+
+            <!-- Bottom Banner for adding new custom table/category -->
+            <div class="mat-card p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 shrink-0">
+                        <i class="fa-solid fa-table-columns text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base">Potrzebujesz kolejnej osobnej tabeli?</h3>
+                        <p class="text-xs text-slate-300 mt-0.5">Możesz utworzyć własne tabele (np. „Samochód i Paliwo”, „Kredyty i Raty”, „Dzieci”, „Inwestycje”) z polami na plus lub minus.</p>
+                    </div>
+                </div>
+                <button onclick="openCategoryModal()" class="mat-btn shrink-0 w-full sm:w-auto px-4 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-folder-plus"></i>
+                    <span>Utwórz nową tabelę</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: ZESTAWIENIE MIESIĘCZNE I ROCZNE + WYKRESY -->
+        <!-- ========================================== -->
+        <div id="view-annual" class="hidden space-y-5">
+
+            <!-- Header & Export CSV -->
+            <div class="mat-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800 font-num" id="annualReportYearTitle">ROK 2026</span>
+                        <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Zestawienie Miesięczne i Roczne</h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Automatyczna kalkulacja z uwzględnieniem pozycji stałych, jednorazowych oraz wygasających w określonym terminie.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button onclick="exportAnnualCSV()" class="mat-btn flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>Pobierz CSV (Excel)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE CHARTS ROW -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <!-- Bar Chart: 12 Months Income vs Expenses -->
+                <div class="lg:col-span-8 mat-card p-4 sm:p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Wykres roczny: Zyski vs Koszty (12 miesięcy)</h3>
+                            <p class="text-[11px] text-slate-500">Kliknij słupek wybranego miesiąca, aby przejść do jego szczegółów</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs font-semibold">
+                            <span class="flex items-center gap-1.5 text-emerald-600"><span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block"></span> Zyski (+)</span>
+                            <span class="flex items-center gap-1.5 text-rose-600"><span class="w-3 h-3 rounded-sm bg-rose-500 inline-block"></span> Koszty (-)</span>
+                        </div>
+                    </div>
+
+                    <!-- Responsive SVG/HTML Bar Chart Container -->
+                    <div id="annualBarChart" class="h-64 w-full pt-4 pb-2 px-1 flex items-end justify-between gap-1.5 sm:gap-2.5 border-b border-slate-200 relative">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Annual Category Breakdown Card -->
+                <div class="lg:col-span-4 mat-card p-4 sm:p-5 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800">Podział kosztów w całym roku</h3>
+                        <p class="text-[11px] text-slate-500 mb-4">Struktura wydatków od stycznia do grudnia</p>
+
+                        <div id="annualDonutContainer" class="flex flex-col items-center justify-center my-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div id="annualBreakdownLegend" class="space-y-2 mt-3 pt-3 border-t border-slate-100 text-xs">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- FULL 12-MONTH TABLE -->
+            <div class="mat-card overflow-hidden">
+                <div class="p-4 sm:px-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-slate-800">Tabela Roczna (Styczeń – Grudzień)</h3>
+                        <p class="text-[11px] text-slate-500">Kliknij dowolny miesiąc, aby otworzyć jego tabele i edytować pozycje</p>
+                    </div>
+                    <span class="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                        <i class="fa-solid fa-calculator mr-1"></i> Precyzyjny algorytm dat
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100/90 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
+                                <th class="py-3 px-3 sm:px-4">Miesiąc</th>
+                                <th class="py-3 px-3 text-right text-emerald-700">Zyski (+)</th>
+                                <th class="py-3 px-3 text-right text-amber-700">Jedzenie (-)</th>
+                                <th class="py-3 px-3 text-right text-indigo-700">Dom (-)</th>
+                                <th class="py-3 px-3 text-right text-purple-700">Dodatkowe (-)</th>
+                                <th class="py-3 px-3 text-right text-rose-700">Suma Kosztów</th>
+                                <th class="py-3 px-3 sm:px-4 text-right">Bilans (Zysk/Strata)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="annualTableBody" class="divide-y divide-slate-200/70 text-xs sm:text-sm">
+                            <!-- Populated by JS -->
+                        </tbody>
+                        <tfoot id="annualTableFoot" class="bg-slate-900 text-white font-bold text-xs sm:text-sm">
+                            <!-- Populated by JS -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Timeline of Expiring ("Do określonej daty") Items -->
+            <div class="mat-card p-4 sm:p-5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                        <i class="fa-solid fa-hourglass-end"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800">Harmonogram pozycji okresowych („Do określonej daty”)</h3>
+                        <p class="text-[11px] text-slate-500">Sprawdź, kiedy kończą się Twoje zobowiązania, raty, subskrypcje lub okresowe zyski</p>
+                    </div>
+                </div>
+                <div id="expiringItemsTimeline" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: KOPIA ZAPASOWA, DANE I INSTALACJA PWA -->
+        <!-- ========================================== -->
+        <div id="view-settings" class="hidden space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <!-- Backup & Export Card -->
+                <div class="mat-card p-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-cloud-arrow-down"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-slate-900">Kopia zapasowa i Eksport danych</h3>
+                            <p class="text-xs text-slate-500">Wszystkie zmiany zapisują się automatycznie w pamięci telefonu (localStorage).</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2.5 pt-2">
+                        <button onclick="exportBackupJSON()" class="mat-btn w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm flex items-center justify-between shadow-sm">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-download"></i> Pobierz kopię zapasową (.JSON)</span>
+                            <i class="fa-solid fa-chevron-right text-xs opacity-75"></i>
+                        </button>
+
+                        <label class="mat-btn w-full py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm flex items-center justify-between cursor-pointer border border-slate-300">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-upload text-blue-600"></i> Wczytaj kopię zapasową z pliku (.JSON)</span>
+                            <input type="file" id="importJsonInput" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                            <i class="fa-solid fa-folder-open text-xs text-slate-500"></i>
+                        </label>
+
+                        <button onclick="exportAnnualCSV()" class="mat-btn w-full py-3 px-4 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs sm:text-sm flex items-center justify-between border border-emerald-200">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-file-csv text-emerald-600"></i> Eksportuj zestawienie roczne do CSV (Excel)</span>
+                            <i class="fa-solid fa-chevron-right text-xs opacity-75"></i>
+                        </button>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-2.5">
+                        <button onclick="confirmRestoreDemoData()" class="mat-btn flex-1 py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold text-xs border border-amber-200 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Przywróć dane przykładowe
+                        </button>
+                        <button onclick="confirmClearAllData()" class="mat-btn flex-1 py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs border border-rose-200 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-trash-can"></i> Wyczyść wszystkie dane
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Android PWA Installation Guide Card -->
+                <div class="mat-card p-5 space-y-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl">
+                            <i class="fa-brands fa-android"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base">Instalacja na telefonie Android (PWA)</h3>
+                            <p class="text-xs text-slate-300">Używaj kalkulatora jak natywnej aplikacji na pełnym ekranie</p>
+                        </div>
+                    </div>
+
+                    <ol class="space-y-3 text-xs text-slate-200 pt-1">
+                        <li class="flex items-start gap-3 bg-slate-800/90 p-3 rounded-2xl border border-slate-700">
+                            <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 text-xs">1</span>
+                            <div>
+                                <span class="font-bold text-white">Otwórz w przeglądarce Chrome na Androidzie</span>
+                                <p class="text-slate-400 mt-0.5">Zapisz ten plik HTML na telefonie lub otwórz link w przeglądarce Google Chrome / Samsung Internet.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 bg-slate-800/90 p-3 rounded-2xl border border-slate-700">
+                            <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 text-xs">2</span>
+                            <div>
+                                <span class="font-bold text-white">Kliknij menu przeglądarki (trzy kropki ⋮)</span>
+                                <p class="text-slate-400 mt-0.5">W prawym górnym rogu ekranu wybierz opcję <strong class="text-emerald-300">„Dodaj do ekranu głównego”</strong> lub <strong class="text-emerald-300">„Zainstaluj aplikację”</strong>.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 bg-slate-800/90 p-3 rounded-2xl border border-slate-700">
+                            <span class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-bold flex items-center justify-center shrink-0 text-xs">3</span>
+                            <div>
+                                <span class="font-bold text-white">Gotowe! Działa również offline</span>
+                                <p class="text-slate-400 mt-0.5">Na pulpicie telefonu pojawi się ikonka <strong>Koszty Życia</strong>. Wszystkie Twoje tabele są bezpiecznie zapisane w telefonie.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FLOATING ACTION BUTTONS (MOBILE: CAMERA + ADD) -->
+    <button onclick="openReceiptScannerModal()" aria-label="Zeskanuj paragon aparatem" class="md:hidden fixed right-4 bottom-36 z-30 w-14 h-14 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-xl shadow-amber-500/30 flex items-center justify-center text-xl mat-btn border-2 border-white" title="Skanuj paragon">
+        <i class="fa-solid fa-camera"></i>
+    </button>
+    <button onclick="openEntryModal()" aria-label="Dodaj nową pozycję" class="md:hidden fixed right-4 bottom-20 z-30 w-14 h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-xl shadow-emerald-600/30 flex items-center justify-center text-xl mat-btn border-2 border-white">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- ANDROID MATERIAL 3 BOTTOM NAVIGATION BAR (MOBILE) -->
+    <nav aria-label="Dolna nawigacja" class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 flex items-center justify-around shadow-lg">
+        <button onclick="switchTab('tables')" id="mobNav-tables" class="flex flex-col items-center py-1 px-3 rounded-2xl text-blue-600 font-bold text-[11px]">
+            <div class="w-12 h-7 rounded-full bg-blue-100 flex items-center justify-center mb-0.5 transition-colors" id="mobPill-tables">
+                <i class="fa-solid fa-layer-group text-sm"></i>
+            </div>
+            <span>Tabele</span>
+        </button>
+
+        <button onclick="switchTab('annual')" id="mobNav-annual" class="flex flex-col items-center py-1 px-3 rounded-2xl text-slate-500 font-medium text-[11px]">
+            <div class="w-12 h-7 rounded-full flex items-center justify-center mb-0.5 transition-colors" id="mobPill-annual">
+                <i class="fa-solid fa-calendar-check text-sm"></i>
+            </div>
+            <span>Rok i Wykresy</span>
+        </button>
+
+        <button onclick="switchTab('settings')" id="mobNav-settings" class="flex flex-col items-center py-1 px-3 rounded-2xl text-slate-500 font-medium text-[11px]">
+            <div class="w-12 h-7 rounded-full flex items-center justify-center mb-0.5 transition-colors" id="mobPill-settings">
+                <i class="fa-solid fa-database text-sm"></i>
+            </div>
+            <span>Kopia / PWA</span>
+        </button>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- MODAL 1: ADD / EDIT ENTRY (POZYCJA)        -->
+    <!-- ========================================== -->
+    <div id="entryModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-slide-up max-h-[92vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div id="entryModalIcon" class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div>
+                        <h3 id="entryModalTitle" class="font-extrabold text-base">Dodaj nową pozycję</h3>
+                        <p class="text-[11px] text-slate-400">Określ kwotę, tabelę oraz tryb obowiązywania</p>
+                    </div>
+                </div>
+                <button onclick="closeEntryModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body Form -->
+            <form id="entryForm" onsubmit="saveEntryForm(event)" class="p-5 space-y-4 overflow-y-auto text-xs sm:text-sm">
+                <input type="hidden" id="entryId">
+
+                <!-- Table / Category Selection -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5">Wybierz tabelę / kategorię:</label>
+                    <select id="entryCategory" onchange="onEntryCategoryChange()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 font-semibold text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Sign (+ Zysk / - Koszt) -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5">Wpływ na bilans (Plus / Minus):</label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button type="button" id="btnTypePlus" onclick="setEntrySign('plus')" class="py-2.5 px-3 rounded-xl font-bold flex items-center justify-center gap-2 border-2 transition-all">
+                            <i class="fa-solid fa-circle-plus"></i>
+                            <span>Na PLUS (+ Zysk)</span>
+                        </button>
+                        <button type="button" id="btnTypeMinus" onclick="setEntrySign('minus')" class="py-2.5 px-3 rounded-xl font-bold flex items-center justify-center gap-2 border-2 transition-all">
+                            <i class="fa-solid fa-circle-minus"></i>
+                            <span>Na MINUS (- Koszt)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Name & Amount -->
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                    <div class="sm:col-span-7">
+                        <label for="entryName" class="block font-bold text-slate-700 mb-1">Nazwa pozycji:</label>
+                        <input type="text" id="entryName" required placeholder="np. Zakupy Biedronka, Czynsz, Premia" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 font-medium text-slate-900 focus:outline-none focus:border-blue-600">
+                    </div>
+                    <div class="sm:col-span-5">
+                        <label for="entryAmount" class="block font-bold text-slate-700 mb-1">Kwota (zł):</label>
+                        <div class="relative">
+                            <input type="number" id="entryAmount" required min="0.01" step="0.01" placeholder="0.00" class="w-full rounded-xl border border-slate-300 pl-3.5 pr-10 py-2.5 font-bold font-num text-slate-900 focus:outline-none focus:border-blue-600">
+                            <span class="absolute right-3.5 top-1/2 -translate-y-1/2 font-bold text-slate-400">zł</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recurrence Type (Stałe / Jednorazowe / Do określonej daty) -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5">Tryb obowiązywania pozycji:</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <button type="button" onclick="setRecurrenceMode('constant')" id="modeBtn-constant" class="p-2.5 rounded-xl border-2 text-left transition-all flex sm:flex-col items-center sm:items-start gap-2 sm:gap-1">
+                            <div class="flex items-center gap-1.5 font-bold text-xs">
+                                <i class="fa-solid fa-rotate text-blue-600"></i>
+                                <span>Stałe</span>
+                            </div>
+                            <span class="text-[10px] text-slate-500 leading-tight">Wlicza się co miesiąc</span>
+                        </button>
+
+                        <button type="button" onclick="setRecurrenceMode('once')" id="modeBtn-once" class="p-2.5 rounded-xl border-2 text-left transition-all flex sm:flex-col items-center sm:items-start gap-2 sm:gap-1">
+                            <div class="flex items-center gap-1.5 font-bold text-xs">
+                                <i class="fa-solid fa-bullseye text-amber-600"></i>
+                                <span>Jednorazowe</span>
+                            </div>
+                            <span class="text-[10px] text-slate-500 leading-tight">Tylko w jednym miesiącu</span>
+                        </button>
+
+                        <button type="button" onclick="setRecurrenceMode('until')" id="modeBtn-until" class="p-2.5 rounded-xl border-2 text-left transition-all flex sm:flex-col items-center sm:items-start gap-2 sm:gap-1">
+                            <div class="flex items-center gap-1.5 font-bold text-xs">
+                                <i class="fa-solid fa-hourglass-half text-purple-600"></i>
+                                <span>Do daty</span>
+                            </div>
+                            <span class="text-[10px] text-slate-500 leading-tight">Co miesiąc do wskazanej daty</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Fields for "Jednorazowe" -->
+                <div id="fields-once" class="hidden p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-2">
+                    <div class="flex items-center gap-2 text-amber-900 font-bold text-xs">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        <span>Data pozycji jednorazowej (wliczy się tylko w tym miesiącu):</span>
+                    </div>
+                    <input type="date" id="entryOnceDate" class="w-full rounded-xl border border-amber-300 bg-white px-3 py-2 font-num font-semibold text-slate-800 focus:outline-none focus:border-amber-600">
+                </div>
+
+                <!-- Dynamic Fields for "Do określonej daty (okresowe)" -->
+                <div id="fields-until" class="hidden p-3.5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-3">
+                    <div class="flex items-center gap-2 text-purple-900 font-bold text-xs">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                        <span>Okres obowiązywania (po dacie końcowej przestaje obciążać budżet):</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                            <label for="entryStartDate" class="block text-[11px] font-semibold text-purple-800 mb-1">Od daty (opcjonalnie):</label>
+                            <input type="date" id="entryStartDate" class="w-full rounded-xl border border-purple-300 bg-white px-3 py-2 font-num text-xs font-semibold text-slate-800">
+                        </div>
+                        <div>
+                            <label for="entryEndDate" class="block text-[11px] font-bold text-purple-900 mb-1">Do daty włącznie (wymagane):</label>
+                            <input type="date" id="entryEndDate" class="w-full rounded-xl border border-purple-400 bg-white px-3 py-2 font-num text-xs font-bold text-slate-900">
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-purple-700 leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Przykład: Rata 0% lub subskrypcja do <strong>2026-12-31</strong> będzie wliczać się do grudnia 2026 włącznie, a od stycznia 2027 wyniesie 0 zł.
+                    </p>
+                </div>
+
+                <!-- Optional Note -->
+                <div>
+                    <label for="entryNote" class="block font-bold text-slate-700 mb-1">Notatka / szczegóły (opcjonalnie):</label>
+                    <input type="text" id="entryNote" placeholder="np. Płatne do 10-go dnia miesiąca, rata 8/12" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs text-slate-700 focus:outline-none focus:border-blue-600">
+                </div>
+
+                <!-- Submit & Cancel -->
+                <div class="flex items-center gap-2.5 pt-2">
+                    <button type="button" onclick="closeEntryModal()" class="mat-btn flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold">
+                        Anuluj
+                    </button>
+                    <button type="submit" class="mat-btn flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold shadow-md shadow-blue-600/20">
+                        Zapisz pozycję
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 2: ADD CUSTOM TABLE / CATEGORY       -->
+    <!-- ========================================== -->
+    <div id="categoryModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-slide-up">
+            <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                        <i class="fa-solid fa-folder-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-base">Nowa własna tabela / kategoria</h3>
+                        <p class="text-[11px] text-slate-400">Dodaj osobną tabelę na wybrane koszty lub zyski</p>
+                    </div>
+                </div>
+                <button onclick="closeCategoryModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="saveCustomCategory(event)" class="p-5 space-y-4 text-xs sm:text-sm">
+                <div>
+                    <label for="catName" class="block font-bold text-slate-700 mb-1">Nazwa nowej tabeli:</label>
+                    <input type="text" id="catName" required placeholder="np. Samochód i Paliwo, Zdrowie, Kredyty" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 font-semibold text-slate-900 focus:outline-none focus:border-purple-600">
+                </div>
+
+                <div>
+                    <label for="catDefaultSign" class="block font-bold text-slate-700 mb-1">Domyślny typ pól w tej tabeli:</label>
+                    <select id="catDefaultSign" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 font-semibold text-slate-800">
+                        <option value="minus">Koszty (- Minus) z możliwością dodania +</option>
+                        <option value="plus">Zyski (+ Plus) z możliwością dodania -</option>
+                        <option value="mixed">Mieszana (+ / - Dodatkowe pola)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="catIcon" class="block font-bold text-slate-700 mb-1">Wybierz ikonę tabeli:</label>
+                    <select id="catIcon" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 font-semibold text-slate-800">
+                        <option value="fa-car">🚗 Samochód / Transport</option>
+                        <option value="fa-piggy-bank">🐷 Oszczędności / Inwestycje</option>
+                        <option value="fa-heart-pulse">❤️ Zdrowie / Leki / Sport</option>
+                        <option value="fa-film">🎬 Rozrywka / Subskrypcje</option>
+                        <option value="fa-graduation-cap">🎓 Edukacja / Dzieci</option>
+                        <option value="fa-credit-card">💳 Raty / Kredyty</option>
+                        <option value="fa-briefcase">💼 Firma / Działalność</option>
+                        <option value="fa-sliders">⚡ Inne własne</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2.5 pt-2">
+                    <button type="button" onclick="closeCategoryModal()" class="mat-btn flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold">
+                        Anuluj
+                    </button>
+                    <button type="submit" class="mat-btn flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold shadow-md">
+                        Utwórz tabelę
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 3: PWA INSTALL INSTRUCTIONS          -->
+    <!-- ========================================== -->
+    <div id="pwaModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-fade-in">
+            <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-brands fa-android text-emerald-400 text-2xl"></i>
+                    <h3 class="font-extrabold text-base">Instalacja PWA (Pixel / Android)</h3>
+                </div>
+                <button onclick="closePwaModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3 text-xs sm:text-sm text-slate-700">
+                <div id="nativeInstallBox" class="hidden p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+                    <p class="font-bold text-emerald-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> Gotowe do bezpośredniej instalacji!
+                    </p>
+                    <p class="text-xs text-emerald-800">Kliknij poniższy przycisk, aby wywołać systemowe okno instalacji w Chrome:</p>
+                    <button onclick="triggerNativePwaInstall()" class="mat-btn w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download"></i> Zainstaluj aplikację teraz
+                    </button>
+                </div>
+
+                <div id="localFileWarningBox" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-300 space-y-1.5">
+                    <p class="font-bold text-amber-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Plik otwarty z pamięci telefonu (file:// / content://)
+                    </p>
+                    <p class="text-xs text-amber-800 leading-relaxed">
+                        Przeglądarka Chrome na Androidzie blokuje instalację PWA z lokalnych plików pobranych na telefon. Aby zainstalować pełną aplikację PWA, wrzuć rozpakowany pakiet ZIP na darmowy hosting HTTPS (np. <strong>app.netlify.com/drop</strong>) i otwórz wygenerowany link w Chrome.
+                    </p>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                    <p class="font-bold text-slate-900">Instrukcja ręczna w Chrome na Pixel 10:</p>
+                    <p>1. Otwórz aplikację przez adres <strong>HTTPS</strong> w przeglądarce Chrome.</p>
+                    <p>2. Naciśnij ikonę menu <strong>⋮ (trzy kropki)</strong> w prawym górnym rogu.</p>
+                    <p>3. Wybierz <strong>„Dodaj do ekranu głównego”</strong> → <strong>„Zainstaluj”</strong>.</p>
+                </div>
+                <button onclick="closePwaModal()" class="mat-btn w-full py-3 rounded-xl bg-slate-900 text-white font-bold mt-2">
+                    Zamknij
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 4: CUSTOM CONFIRMATION DIALOG        -->
+    <!-- ========================================== -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-slate-200 p-5 animate-fade-in">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                </div>
+                <h3 id="confirmTitle" class="font-extrabold text-base text-slate-900">Potwierdzenie</h3>
+            </div>
+            <p id="confirmMessage" class="text-xs sm:text-sm text-slate-600 mb-5 leading-relaxed"></p>
+            <div class="flex items-center gap-2.5">
+                <button onclick="closeConfirmModal()" class="mat-btn flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm">
+                    Anuluj
+                </button>
+                <button id="confirmActionBtn" class="mat-btn flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-md">
+                    Potwierdź
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 5: RECEIPT SCANNER (APARAT + OCR/AI) -->
+    <!-- ========================================== -->
+    <div id="receiptScannerModal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-slide-up max-h-[94vh] flex flex-col">
+            <!-- Header -->
+            <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center">
+                        <i class="fa-solid fa-camera text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-base">Skaner Paragonów (Aparat)</h3>
+                        <p class="text-[11px] text-slate-400">Zrób zdjęcie paragonu, aby automatycznie odczytać kwotę i sklep</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="toggleScannerAiSettings()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] font-bold flex items-center gap-1" title="Ustawienia silnika AI">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Tryb AI</span>
+                    </button>
+                    <button type="button" onclick="closeReceiptScannerModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="p-4 sm:p-5 space-y-4 overflow-y-auto text-xs sm:text-sm flex-1">
+
+                <!-- Optional Gemini AI Key Box (Hidden by default) -->
+                <div id="scannerAiSettingsBox" class="hidden p-3.5 rounded-2xl bg-slate-900 text-white space-y-2.5 border border-slate-700">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-xs text-amber-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-robot"></i> Opcjonalny klucz Google Gemini AI (100% precyzji)
+                        </span>
+                        <span id="aiKeyStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">Tryb lokalny OCR</span>
+                    </div>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                        Domyślnie skaner działa <strong>całkowicie za darmo i bez klucza</strong> (silnik OCR Tesseract w telefonie). Jeśli jednak chcesz rozbijać trudne/pogniecione paragony przez sztuczną inteligencję Gemini Vision, możesz wkleić darmowy klucz API z Google AI Studio:
+                    </p>
+                    <div class="flex gap-2">
+                        <input type="password" id="geminiApiKeyInput" placeholder="Wklej klucz AIzaSy..." class="flex-1 rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400">
+                        <button type="button" onclick="saveGeminiApiKey()" class="mat-btn px-3.5 py-2 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">
+                            Zapisz
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden File Inputs for Native Camera & Gallery -->
+                <input type="file" id="receiptCameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptFileSelect(event)">
+                <input type="file" id="receiptGalleryInput" accept="image/*" class="hidden" onchange="handleReceiptFileSelect(event)">
+
+                <!-- Capture Action Buttons -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <button type="button" onclick="document.getElementById('receiptCameraInput').click()" class="mat-btn py-3 px-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold flex items-center justify-center gap-2 shadow-md shadow-amber-500/15">
+                        <i class="fa-solid fa-camera text-base"></i>
+                        <span>Aparat (Zrób zdjęcie)</span>
+                    </button>
+
+                    <button type="button" onclick="document.getElementById('receiptGalleryInput').click()" class="mat-btn py-3 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold flex items-center justify-center gap-2 border border-slate-300">
+                        <i class="fa-regular fa-image text-base text-blue-600"></i>
+                        <span>Wybierz z galerii</span>
+                    </button>
+
+                    <button type="button" onclick="startLiveCameraStream()" id="btnStartLiveCam" class="mat-btn py-3 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold flex items-center justify-center gap-2 border border-slate-300">
+                        <i class="fa-solid fa-video text-base text-emerald-600"></i>
+                        <span>Kamera na żywo</span>
+                    </button>
+                </div>
+
+                <!-- Live Camera Stream Box (When using WebRTC in-app viewfinder) -->
+                <div id="liveCameraContainer" class="hidden rounded-2xl overflow-hidden bg-black relative border-2 border-amber-400">
+                    <video id="liveCameraVideo" autoplay playsinline muted class="w-full max-h-72 object-cover"></video>
+                    <!-- Receipt framing guide overlay -->
+                    <div class="absolute inset-4 border-2 border-dashed border-amber-400/70 rounded-xl pointer-events-none flex items-end justify-center pb-2">
+                        <span class="bg-black/60 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full">Nakieruj na kwotę SUMA PLN na paragonie</span>
+                    </div>
+                    <div class="p-3 bg-slate-900 flex items-center justify-between gap-2">
+                        <button type="button" onclick="stopLiveCameraStream()" class="px-3 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">
+                            Zamknij podgląd
+                        </button>
+                        <button type="button" onclick="captureFrameFromLiveCamera()" class="mat-btn flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-camera"></i> Uchwyć i zeskanuj paragon
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Scanning Progress & Image Preview -->
+                <div id="scanProgressSection" class="hidden p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <img id="receiptPreviewThumb" src="" alt="Podgląd paragonu" class="w-16 h-20 object-cover rounded-xl border border-slate-300 bg-white shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span id="scanStatusTitle" class="font-extrabold text-xs text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Analizowanie paragonu...
+                                </span>
+                                <span id="scanProgressPct" class="font-num font-bold text-xs text-blue-600">0%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="scanProgressBar" class="bg-blue-600 h-full transition-all duration-200" style="width: 5%"></div>
+                            </div>
+                            <p id="scanStatusSubtitle" class="text-[11px] text-slate-500 mt-1.5 truncate">
+                                Wyostrzanie obrazu i wyszukiwanie pozycji SUMA PLN...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scan Result Form (Editable before adding to budget) -->
+                <form id="scannedResultForm" onsubmit="saveScannedReceiptExpense(event)" class="hidden space-y-3.5 pt-2 border-t border-slate-200">
+                    <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl">
+                        <span class="font-bold text-xs text-emerald-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check text-emerald-600"></i> Dane odczytane z paragonu (możesz je edytować)
+                        </span>
+                        <span id="detectedStoreBadge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-200/70 text-emerald-900">Paragon</span>
+                    </div>
+
+                    <!-- Mode switcher: Whole receipt vs Individual items (shown when multiple items found) -->
+                    <div id="scanImportModeWrapper" class="hidden grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
+                        <button type="button" id="btnImportModeSingle" onclick="setReceiptImportMode('single')" class="py-1.5 px-2 rounded-lg font-bold text-xs bg-white text-slate-900 shadow-xs">
+                            1 łączna kwota (SUMA)
+                        </button>
+                        <button type="button" id="btnImportModeItems" onclick="setReceiptImportMode('items')" class="py-1.5 px-2 rounded-lg font-semibold text-xs text-slate-600">
+                            Poszczególne produkty (<span id="detectedItemsCount">0</span>)
+                        </button>
+                    </div>
+
+                    <!-- Single Total Mode Fields -->
+                    <div id="singleReceiptFields" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div class="sm:col-span-5">
+                                <label for="scannedAmountInput" class="block font-bold text-slate-700 mb-1">Kwota z paragonu (zł):</label>
+                                <div class="relative">
+                                    <input type="number" id="scannedAmountInput" required min="0.01" step="0.01" placeholder="0.00" class="w-full rounded-xl border-2 border-emerald-500 bg-emerald-50/30 pl-3.5 pr-10 py-2.5 font-extrabold font-num text-base text-slate-900 focus:outline-none focus:border-blue-600">
+                                    <span class="absolute right-3.5 top-1/2 -translate-y-1/2 font-bold text-slate-400">zł</span>
+                                </div>
+                            </div>
+                            <div class="sm:col-span-7">
+                                <label for="scannedNameInput" class="block font-bold text-slate-700 mb-1">Nazwa wydatku / Sklep:</label>
+                                <input type="text" id="scannedNameInput" required placeholder="np. Paragon: Biedronka" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 font-semibold text-slate-900 focus:outline-none focus:border-blue-600">
+                            </div>
+                        </div>
+
+                        <!-- Quick clickable chips of other amounts found on the receipt -->
+                        <div id="otherDetectedAmountsBox" class="hidden">
+                            <span class="block text-[11px] font-semibold text-slate-500 mb-1">Inne kwoty wykryte na paragonie (dotknij, aby podmienić):</span>
+                            <div id="otherDetectedAmountsChips" class="flex items-center gap-1.5 flex-wrap"></div>
+                        </div>
+                    </div>
+
+                    <!-- Multi-Items Mode List (Hidden unless switched) -->
+                    <div id="multiItemsReceiptFields" class="hidden space-y-2 max-h-48 overflow-y-auto p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <p class="text-[11px] font-semibold text-slate-500">Zaznacz pozycje z paragonu, które chcesz dodać osobno do tabeli:</p>
+                        <div id="scannedItemsChecklist" class="space-y-1.5"></div>
+                    </div>
+
+                    <!-- Common fields: Target Table & Date & Mode -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label for="scannedCategorySelect" class="block font-bold text-slate-700 mb-1">Dodaj do tabeli:</label>
+                            <select id="scannedCategorySelect" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 font-bold text-slate-800">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="scannedDateInput" class="block font-bold text-slate-700 mb-1">Data paragonu (Jednorazowe):</label>
+                            <input type="date" id="scannedDateInput" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 font-num font-bold text-slate-800">
+                        </div>
+                    </div>
+
+                    <!-- Raw OCR text preview (collapsible) -->
+                    <details class="text-[11px] text-slate-500 bg-slate-50 rounded-xl p-2.5 border border-slate-200">
+                        <summary class="cursor-pointer font-semibold text-slate-600">Pokaż pełny odczytany tekst z paragonu (OCR)</summary>
+                        <pre id="rawOcrTextOutput" class="mt-2 whitespace-pre-wrap font-mono text-[10px] text-slate-600 max-h-32 overflow-y-auto"></pre>
+                    </details>
+
+                    <div class="flex items-center gap-2.5 pt-2">
+                        <button type="button" onclick="closeReceiptScannerModal()" class="mat-btn flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold">
+                            Anuluj
+                        </button>
+                        <button type="submit" class="mat-btn flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Dodaj wydatek do tabeli</span>
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastContainer" class="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2"></div>
+
+    <script>
+        const MONTHS_PL = [
+            'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
+            'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
+        ];
+        const MONTHS_SHORT_PL = [
+            'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze',
+            'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'
+        ];
+
+        const STORAGE_KEY = 'kalkulator_kosztow_zycia_pwa_v1';
+
+        // Default Period: October 2026 (month index 9, year 2026)
+        let currentState = {
+            selectedYear: 2026,
+            selectedMonth: 9, // 0-indexed: 9 = Październik
+            activeTab: 'tables',
+            entrySign: 'minus',
+            entryMode: 'constant',
+            categories: [],
+            items: []
+        };
+
+        function getDefaultCategories() {
+            return [
+                {
+                    id: 'income',
+                    name: 'Zyski i Przychody (+)',
+                    subtitle: 'Wypłata, premie, świadczenia, dodatkowe zlecenia',
+                    defaultSign: 'plus',
+                    icon: 'fa-sack-dollar',
+                    theme: 'emerald',
+                    system: true
+                },
+                {
+                    id: 'food',
+                    name: 'Jedzenie (-)',
+                    subtitle: 'Zakupy spożywcze, piekarnia, warzywniak, jedzenie na mieście',
+                    defaultSign: 'minus',
+                    icon: 'fa-utensils',
+                    theme: 'amber',
+                    system: true
+                },
+                {
+                    id: 'home',
+                    name: 'Koszty związane z domem (-)',
+                    subtitle: 'Czynsz, prąd, gaz, internet, kredyt/najem, chemia domowa',
+                    defaultSign: 'minus',
+                    icon: 'fa-house-chimney',
+                    theme: 'indigo',
+                    system: true
+                },
+                {
+                    id: 'custom',
+                    name: 'Dodatkowe pola (+ / -)',
+                    subtitle: 'Paliwo, raty, subskrypcje, dodatkowe wpływy lub wydatki',
+                    defaultSign: 'mixed',
+                    icon: 'fa-sliders',
+                    theme: 'purple',
+                    system: true
+                }
+            ];
+        }
+
+        function getDefaultItems() {
+            return [
+                // TABELA 1: ZYSKI I PRZYCHODY (+)
+                {
+                    id: 'inc-1',
+                    categoryId: 'income',
+                    name: 'Wypłata (Etat netto)',
+                    amount: 6800.00,
+                    sign: 'plus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Stały przelew do 10-go każdego miesiąca'
+                },
+                {
+                    id: 'inc-2',
+                    categoryId: 'income',
+                    name: 'Wynajem garażu / miejsca postojowego',
+                    amount: 350.00,
+                    sign: 'plus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Stały dochód pasywny'
+                },
+                {
+                    id: 'inc-3',
+                    categoryId: 'income',
+                    name: 'Dodatkowe zlecenie (Projekt jesienny)',
+                    amount: 950.00,
+                    sign: 'plus',
+                    mode: 'until',
+                    onceDate: '',
+                    startDate: '2026-09-01',
+                    endDate: '2026-11-30',
+                    note: 'Umowa dodatkowa ważna tylko do końca listopada 2026'
+                },
+                {
+                    id: 'inc-4',
+                    categoryId: 'income',
+                    name: 'Premia kwartalna / Zwrot',
+                    amount: 600.00,
+                    sign: 'plus',
+                    mode: 'once',
+                    onceDate: '2026-10-15',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Wypłacona jednorazowo w październiku 2026'
+                },
+
+                // TABELA 2: JEDZENIE (-)
+                {
+                    id: 'food-1',
+                    categoryId: 'food',
+                    name: 'Zakupy spożywcze (Biedronka / Lidl)',
+                    amount: 1650.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Cotygodniowe duże zakupy spożywcze'
+                },
+                {
+                    id: 'food-2',
+                    categoryId: 'food',
+                    name: 'Piekarnia, warzywniak i mięsny',
+                    amount: 420.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Świeże pieczywo, owoce i warzywa'
+                },
+                {
+                    id: 'food-3',
+                    categoryId: 'food',
+                    name: 'Restauracje / Obiady na mieście',
+                    amount: 280.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Wyjścia weekendowe i kawa'
+                },
+                {
+                    id: 'food-4',
+                    categoryId: 'food',
+                    name: 'Urodzinowa kolacja rodzinna',
+                    amount: 240.00,
+                    sign: 'minus',
+                    mode: 'once',
+                    onceDate: '2026-10-18',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Wydatek jednorazowy w październiku'
+                },
+
+                // TABELA 3: KOSZTY ZWIĄZANE Z DOMEM (-)
+                {
+                    id: 'home-1',
+                    categoryId: 'home',
+                    name: 'Czynsz administracyjny i woda',
+                    amount: 920.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Opłata do spółdzielni / wspólnoty'
+                },
+                {
+                    id: 'home-2',
+                    categoryId: 'home',
+                    name: 'Rata kredytu mieszkaniowego / Najem',
+                    amount: 1850.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Stałe obciążenie mieszkaniowe'
+                },
+                {
+                    id: 'home-3',
+                    categoryId: 'home',
+                    name: 'Prąd i Gaz (prognoza miesięczna)',
+                    amount: 340.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Rachunki za media'
+                },
+                {
+                    id: 'home-4',
+                    categoryId: 'home',
+                    name: 'Internet światłowodowy + TV',
+                    amount: 115.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Umowa stała'
+                },
+                {
+                    id: 'home-5',
+                    categoryId: 'home',
+                    name: 'Raty 0% za pralkę i suszarkę',
+                    amount: 290.00,
+                    sign: 'minus',
+                    mode: 'until',
+                    onceDate: '',
+                    startDate: '2026-01-01',
+                    endDate: '2026-12-31',
+                    note: 'Koniec spłaty w grudniu 2026! Od 2027 roku 0 zł'
+                },
+                {
+                    id: 'home-6',
+                    categoryId: 'home',
+                    name: 'Środki czystości i chemia domowa',
+                    amount: 130.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Proszki, kapsułki, papier'
+                },
+
+                // TABELA 4: DODATKOWE POLA (+ / -)
+                {
+                    id: 'cust-1',
+                    categoryId: 'custom',
+                    name: 'Paliwo i komunikacja',
+                    amount: 550.00,
+                    sign: 'minus',
+                    mode: 'constant',
+                    onceDate: '',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Dojazdy do pracy'
+                },
+                {
+                    id: 'cust-2',
+                    categoryId: 'custom',
+                    name: 'Karnet sportowy + subskrypcje',
+                    amount: 169.00,
+                    sign: 'minus',
+                    mode: 'until',
+                    onceDate: '',
+                    startDate: '2026-01-01',
+                    endDate: '2026-10-31',
+                    note: 'Wypowiedziana umowa – działa tylko do końca października 2026'
+                },
+                {
+                    id: 'cust-3',
+                    categoryId: 'custom',
+                    name: 'Spłacona pożyczka ratalna (przykład wygasłej)',
+                    amount: 400.00,
+                    sign: 'minus',
+                    mode: 'until',
+                    onceDate: '',
+                    startDate: '2026-01-01',
+                    endDate: '2026-08-31',
+                    note: 'Zakończona w sierpniu 2026 – w październiku już nie obciąża budżetu'
+                },
+                {
+                    id: 'cust-4',
+                    categoryId: 'custom',
+                    name: 'Sprzedaż nieużywanych rzeczy (OLX / Vinted)',
+                    amount: 220.00,
+                    sign: 'plus',
+                    mode: 'once',
+                    onceDate: '2026-10-08',
+                    startDate: '',
+                    endDate: '',
+                    note: 'Dodatkowy zysk na plus w październiku'
+                }
+            ];
+        }
+
+        /**
+         * Checks whether an item is active in a given (year, month) where month is 0..11.
+         * Returns { active: boolean, statusText: string, badgeType: string, isExpired: boolean }
+         */
+        function evaluateItemForMonth(item, year, month) {
+            const targetYM = year * 12 + month;
+
+            if (item.mode === 'constant') {
+                return {
+                    active: true,
+                    statusText: 'Stałe (co miesiąc)',
+                    badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
+                    icon: 'fa-rotate',
+                    reason: ''
+                };
+            }
+
+            if (item.mode === 'once') {
+                if (!item.onceDate) {
+                    return { active: false, statusText: 'Brak daty', badgeClass: 'bg-slate-100 text-slate-500', icon: 'fa-calendar', reason: 'Brak daty' };
+                }
+                const parts = item.onceDate.split('-');
+                const onceY = parseInt(parts[0], 10);
+                const onceM = parseInt(parts[1], 10) - 1;
+                const onceYM = onceY * 12 + onceM;
+                const formattedPeriod = `${MONTHS_SHORT_PL[onceM]} ${onceY}`;
+
+                if (onceYM === targetYM) {
+                    return {
+                        active: true,
+                        statusText: `Jednorazowe (${formattedPeriod})`,
+                        badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+                        icon: 'fa-bullseye',
+                        reason: ''
+                    };
+                } else {
+                    return {
+                        active: false,
+                        statusText: `Jednorazowe (${formattedPeriod})`,
+                        badgeClass: 'bg-slate-100 text-slate-500 border-slate-200',
+                        icon: 'fa-bullseye',
+                        reason: `Dotyczy tylko: ${MONTHS_PL[onceM]} ${onceY}`
+                    };
+                }
+            }
+
+            if (item.mode === 'until') {
+                if (!item.endDate) {
+                    return { active: true, statusText: 'Okresowe', badgeClass: 'bg-purple-50 text-purple-700 border-purple-200', icon: 'fa-hourglass-half', reason: '' };
+                }
+                const endParts = item.endDate.split('-');
+                const endY = parseInt(endParts[0], 10);
+                const endM = parseInt(endParts[1], 10) - 1;
+                const endYM = endY * 12 + endM;
+
+                let startYM = -Infinity;
+                if (item.startDate) {
+                    const startParts = item.startDate.split('-');
+                    const sY = parseInt(startParts[0], 10);
+                    const sM = parseInt(startParts[1], 10) - 1;
+                    startYM = sY * 12 + sM;
+                }
+
+                const endFormatted = `${MONTHS_SHORT_PL[endM]} ${endY}`;
+
+                if (targetYM < startYM) {
+                    const sParts = item.startDate.split('-');
+                    const sLabel = `${MONTHS_SHORT_PL[parseInt(sParts[1], 10) - 1]} ${sParts[0]}`;
+                    return {
+                        active: false,
+                        statusText: `Od: ${sLabel} do ${endFormatted}`,
+                        badgeClass: 'bg-slate-100 text-slate-500 border-slate-200',
+                        icon: 'fa-clock',
+                        reason: `Rozpoczyna się dopiero w: ${sLabel}`
+                    };
+                }
+
+                if (targetYM <= endYM) {
+                    const monthsLeft = endYM - targetYM + 1;
+                    const leftText = monthsLeft === 1 ? 'Ostatni mies.!' : `zostało: ${monthsLeft} mies.`;
+                    return {
+                        active: true,
+                        statusText: `Do: ${endFormatted} (${leftText})`,
+                        badgeClass: monthsLeft === 1
+                            ? 'bg-orange-100 text-orange-800 border-orange-300'
+                            : 'bg-purple-50 text-purple-800 border-purple-200',
+                        icon: 'fa-hourglass-half',
+                        reason: ''
+                    };
+                } else {
+                    return {
+                        active: false,
+                        statusText: `Wygasło: ${endFormatted}`,
+                        badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 line-through',
+                        icon: 'fa-hourglass-end',
+                        reason: `Zakończono w: ${MONTHS_PL[endM]} ${endY}`
+                    };
+                }
+            }
+
+            return { active: true, statusText: 'Stałe', badgeClass: 'bg-blue-50 text-blue-700', icon: 'fa-rotate', reason: '' };
+        }
+
+        function calculateMonthTotals(year, month) {
+            let totalIncome = 0;
+            let totalExpense = 0;
+            let foodExpense = 0;
+            let homeExpense = 0;
+            let otherExpense = 0;
+            let activeCount = 0;
+            let expiredCount = 0;
+
+            for (const item of currentState.items) {
+                const evalRes = evaluateItemForMonth(item, year, month);
+                const val = Number(item.amount) || 0;
+
+                if (evalRes.active) {
+                    activeCount++;
+                    if (item.sign === 'plus') {
+                        totalIncome += val;
+                    } else {
+                        totalExpense += val;
+                        if (item.categoryId === 'food') {
+                            foodExpense += val;
+                        } else if (item.categoryId === 'home') {
+                            homeExpense += val;
+                        } else {
+                            otherExpense += val;
+                        }
+                    }
+                } else {
+                    expiredCount++;
+                }
+            }
+
+            const netBalance = totalIncome - totalExpense;
+            return {
+                totalIncome,
+                totalExpense,
+                foodExpense,
+                homeExpense,
+                otherExpense,
+                netBalance,
+                activeCount,
+                expiredCount
+            };
+        }
+
+        function calculateYearTotals(year) {
+            const monthsData = [];
+            let yearIncome = 0;
+            let yearExpense = 0;
+            let yearFood = 0;
+            let yearHome = 0;
+            let yearOther = 0;
+
+            for (let m = 0; m < 12; m++) {
+                const mTotals = calculateMonthTotals(year, m);
+                monthsData.push({
+                    monthIndex: m,
+                    monthName: MONTHS_PL[m],
+                    monthShort: MONTHS_SHORT_PL[m],
+                    ...mTotals
+                });
+                yearIncome += mTotals.totalIncome;
+                yearExpense += mTotals.totalExpense;
+                yearFood += mTotals.foodExpense;
+                yearHome += mTotals.homeExpense;
+                yearOther += mTotals.otherExpense;
+            }
+
+            return {
+                year,
+                monthsData,
+                yearIncome,
+                yearExpense,
+                yearFood,
+                yearHome,
+                yearOther,
+                yearNet: yearIncome - yearExpense
+            };
+        }
+
+        function formatPLN(amount, showPlus = false) {
+            const num = Number(amount) || 0;
+            const formatted = Math.abs(num).toLocaleString('pl-PL', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + ' zł';
+
+            if (num > 0 && showPlus) return '+' + formatted;
+            if (num < 0) return '-' + formatted;
+            return formatted;
+        }
+
+        function saveToStorage() {
+            try {
+                const payload = {
+                    selectedYear: currentState.selectedYear,
+                    selectedMonth: currentState.selectedMonth,
+                    categories: currentState.categories,
+                    items: currentState.items
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            } catch (err) {
+                console.error('Błąd zapisu localStorage:', err);
+            }
+        }
+
+        function loadFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed.categories) && parsed.categories.length > 0) {
+                        currentState.categories = parsed.categories;
+                    } else {
+                        currentState.categories = getDefaultCategories();
+                    }
+                    if (Array.isArray(parsed.items)) {
+                        currentState.items = parsed.items;
+                    } else {
+                        currentState.items = getDefaultItems();
+                    }
+                    if (typeof parsed.selectedYear === 'number') currentState.selectedYear = parsed.selectedYear;
+                    if (typeof parsed.selectedMonth === 'number') currentState.selectedMonth = parsed.selectedMonth;
+                    return;
+                }
+            } catch (e) {
+                console.error('Błąd odczytu localStorage:', e);
+            }
+            // Fallback to default starter data
+            currentState.categories = getDefaultCategories();
+            currentState.items = getDefaultItems();
+            saveToStorage();
+        }
+
+        function renderDashboard() {
+            const y = currentState.selectedYear;
+            const m = currentState.selectedMonth;
+            const mStats = calculateMonthTotals(y, m);
+            const yStats = calculateYearTotals(y);
+
+            // Update Period Selectors
+            document.getElementById('selectMonth').value = String(m);
+            document.getElementById('selectYear').value = String(y);
+            document.getElementById('dashboardPeriodLabel').textContent = `${MONTHS_PL[m].toUpperCase()} ${y}`;
+
+            // Card 1: Monthly Balance Card styling & values
+            const balanceCard = document.getElementById('monthlyBalanceCard');
+            const statusBadge = document.getElementById('monthlyStatusBadge');
+            const netEl = document.getElementById('monthlyNetValue');
+            const savingsEl = document.getElementById('monthlySavingsRate');
+
+            if (mStats.netBalance >= 0) {
+                balanceCard.className = 'md:col-span-5 rounded-3xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden transition-colors duration-300 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900';
+                statusBadge.textContent = 'ZYSK NETTO (NA PLUS)';
+                statusBadge.className = 'px-2.5 py-1 rounded-xl text-[11px] font-extrabold uppercase tracking-wide bg-white/20 text-white backdrop-blur-sm';
+                netEl.textContent = formatPLN(mStats.netBalance, true);
+            } else {
+                balanceCard.className = 'md:col-span-5 rounded-3xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden transition-colors duration-300 bg-gradient-to-br from-rose-600 via-red-700 to-rose-950';
+                statusBadge.textContent = 'STRATA NETTO (NA MINUS)';
+                statusBadge.className = 'px-2.5 py-1 rounded-xl text-[11px] font-extrabold uppercase tracking-wide bg-black/25 text-rose-100 backdrop-blur-sm';
+                netEl.textContent = formatPLN(mStats.netBalance, true);
+            }
+
+            if (mStats.totalIncome > 0) {
+                const rate = Math.round((mStats.netBalance / mStats.totalIncome) * 100);
+                if (rate >= 0) {
+                    savingsEl.textContent = `Zostaje w kieszeni: ${rate}% przychodów tego miesiąca`;
+                } else {
+                    savingsEl.textContent = `Wydatki przekraczają przychody o ${Math.abs(rate)}%`;
+                }
+            } else {
+                savingsEl.textContent = 'Brak wpisanych przychodów w tym miesiącu';
+            }
+
+            document.getElementById('monthlyIncomeValue').textContent = formatPLN(mStats.totalIncome, true);
+            document.getElementById('monthlyExpenseValue').textContent = '-' + formatPLN(mStats.totalExpense, false);
+
+            // Card 2: Expense Structure Breakdown
+            document.getElementById('activeItemsCountBadge').textContent = `${mStats.activeCount} aktywnych pozycji`;
+            document.getElementById('expiredCountLabel').textContent = `${mStats.expiredCount} pozycji`;
+
+            const expTotal = mStats.totalExpense > 0 ? mStats.totalExpense : 1;
+            const pFood = mStats.totalExpense > 0 ? Math.round((mStats.foodExpense / expTotal) * 100) : 0;
+            const pHome = mStats.totalExpense > 0 ? Math.round((mStats.homeExpense / expTotal) * 100) : 0;
+            const pOther = mStats.totalExpense > 0 ? Math.max(0, 100 - pFood - pHome) : 0;
+
+            document.getElementById('barFood').style.width = `${mStats.totalExpense > 0 ? Math.max(4, pFood) : 33}%`;
+            document.getElementById('barHome').style.width = `${mStats.totalExpense > 0 ? Math.max(4, pHome) : 33}%`;
+            document.getElementById('barOther').style.width = `${mStats.totalExpense > 0 ? Math.max(4, pOther) : 34}%`;
+
+            document.getElementById('pctFood').textContent = `${pFood}%`;
+            document.getElementById('valFood').textContent = formatPLN(mStats.foodExpense);
+            document.getElementById('pctHome').textContent = `${pHome}%`;
+            document.getElementById('valHome').textContent = formatPLN(mStats.homeExpense);
+            document.getElementById('pctOther').textContent = `${pOther}%`;
+            document.getElementById('valOther').textContent = formatPLN(mStats.otherExpense);
+
+            // Card 3: Annual Overview
+            document.getElementById('annualYearBadge').textContent = String(y);
+            const annualNetEl = document.getElementById('annualNetValue');
+            annualNetEl.textContent = formatPLN(yStats.yearNet, true);
+            annualNetEl.className = yStats.yearNet >= 0
+                ? 'text-xl sm:text-2xl font-extrabold font-num mt-1 text-emerald-400'
+                : 'text-xl sm:text-2xl font-extrabold font-num mt-1 text-rose-400';
+
+            document.getElementById('annualIncomeValue').textContent = formatPLN(yStats.yearIncome, true);
+            document.getElementById('annualExpenseValue').textContent = '-' + formatPLN(yStats.yearExpense, false);
+        }
+
+        function getThemeStyles(theme) {
+            const map = {
+                emerald: {
+                    headerBg: 'bg-emerald-50/90 border-emerald-200/80',
+                    iconBg: 'bg-emerald-500 text-white shadow-emerald-500/20',
+                    badge: 'bg-emerald-100 text-emerald-800',
+                    btn: 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                },
+                amber: {
+                    headerBg: 'bg-amber-50/90 border-amber-200/80',
+                    iconBg: 'bg-amber-500 text-white shadow-amber-500/20',
+                    badge: 'bg-amber-100 text-amber-900',
+                    btn: 'bg-amber-500 hover:bg-amber-600 text-slate-950'
+                },
+                indigo: {
+                    headerBg: 'bg-indigo-50/90 border-indigo-200/80',
+                    iconBg: 'bg-indigo-600 text-white shadow-indigo-500/20',
+                    badge: 'bg-indigo-100 text-indigo-800',
+                    btn: 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                },
+                purple: {
+                    headerBg: 'bg-purple-50/90 border-purple-200/80',
+                    iconBg: 'bg-purple-600 text-white shadow-purple-500/20',
+                    badge: 'bg-purple-100 text-purple-800',
+                    btn: 'bg-purple-600 hover:bg-purple-700 text-white'
+                }
+            };
+            return map[theme] || map.purple;
+        }
+
+        function renderTables() {
+            const container = document.getElementById('tablesContainer');
+            const showInactive = document.getElementById('toggleShowInactive').checked;
+            const y = currentState.selectedYear;
+            const m = currentState.selectedMonth;
+
+            let html = '';
+
+            for (const cat of currentState.categories) {
+                const styles = getThemeStyles(cat.theme);
+                const catItems = currentState.items.filter(it => it.categoryId === cat.id);
+
+                // Calculate category sum for active month
+                let catPlus = 0;
+                let catMinus = 0;
+                let activeItemsInCat = 0;
+                let hiddenInactiveCount = 0;
+
+                const evaluatedList = catItems.map(item => {
+                    const ev = evaluateItemForMonth(item, y, m);
+                    if (ev.active) {
+                        activeItemsInCat++;
+                        if (item.sign === 'plus') catPlus += Number(item.amount) || 0;
+                        else catMinus += Number(item.amount) || 0;
+                    } else {
+                        hiddenInactiveCount++;
+                    }
+                    return { item, ev };
+                });
+
+                const netCat = catPlus - catMinus;
+                const netFormatted = netCat >= 0 ? formatPLN(netCat, true) : formatPLN(netCat, false);
+                const netColorClass = netCat > 0 ? 'text-emerald-700' : (netCat < 0 ? 'text-rose-600' : 'text-slate-600');
+
+                const visibleEntries = evaluatedList.filter(entry => showInactive || entry.ev.active);
+
+                html += `
+                <article id="section-${cat.id}" class="mat-card overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <!-- Category Header -->
+                        <div class="p-4 border-b ${styles.headerBg} flex items-start justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl ${styles.iconBg} shadow-md flex items-center justify-center shrink-0">
+                                    <i class="fa-solid ${cat.icon} text-base"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-extrabold text-sm sm:text-base text-slate-900">${escapeHtml(cat.name)}</h3>
+                                        ${!cat.system ? `
+                                            <button onclick="confirmDeleteCategory('${cat.id}')" class="text-slate-400 hover:text-rose-600 text-xs px-1.5 py-0.5 rounded" title="Usuń własną tabelę">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 leading-snug">${escapeHtml(cat.subtitle || 'Własna kategoria budżetowa')}</p>
+                                </div>
+                            </div>
+
+                            <div class="text-right shrink-0">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Suma (${MONTHS_SHORT_PL[m]})</span>
+                                <span class="text-base sm:text-lg font-extrabold font-num ${netColorClass}">${netFormatted}</span>
+                            </div>
+                        </div>
+
+                        <!-- Table Items List -->
+                        <div class="divide-y divide-slate-100">
+                `;
+
+                if (visibleEntries.length === 0) {
+                    html += `
+                        <div class="p-6 text-center text-slate-400 text-xs">
+                            <i class="fa-solid fa-receipt text-2xl mb-2 opacity-40 block"></i>
+                            Brak aktywnych pozycji w tej tabeli dla: <strong>${MONTHS_PL[m]} ${y}</strong>.
+                            ${hiddenInactiveCount > 0 ? `<br><span class="text-[11px] text-slate-500">(${hiddenInactiveCount} wygasłych lub jednorazowych z innych miesięcy jest ukrytych)</span>` : ''}
+                        </div>
+                    `;
+                } else {
+                    for (const { item, ev } of visibleEntries) {
+                        const isPlus = item.sign === 'plus';
+                        const amountStr = isPlus ? `+${formatPLN(item.amount)}` : `-${formatPLN(item.amount)}`;
+                        const amountColor = !ev.active
+                            ? 'text-slate-400 line-through'
+                            : (isPlus ? 'text-emerald-600' : 'text-rose-600');
+                        const rowOpacity = !ev.active ? 'bg-slate-50/80 opacity-65' : 'hover:bg-slate-50/90';
+
+                        html += `
+                        <div class="p-3 sm:px-4 flex items-center justify-between gap-2 transition-colors ${rowOpacity}">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="w-5 h-5 rounded-md ${isPlus ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'} font-extrabold text-xs inline-flex items-center justify-center shrink-0">
+                                        ${isPlus ? '+' : '−'}
+                                    </span>
+                                    <span class="font-bold text-xs sm:text-sm text-slate-800 truncate ${!ev.active ? 'line-through text-slate-500' : ''}">
+                                        ${escapeHtml(item.name)}
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center gap-1.5 flex-wrap mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${ev.badgeClass}">
+                                        <i class="fa-solid ${ev.icon}"></i>
+                                        <span>${ev.statusText}</span>
+                                    </span>
+                                    ${!ev.active ? `
+                                        <span class="text-[10px] font-bold text-slate-500 bg-slate-200/70 px-1.5 py-0.5 rounded">
+                                            0,00 zł w tym mies. (${ev.reason})
+                                        </span>
+                                    ` : ''}
+                                    ${item.note ? `
+                                        <span class="text-[11px] text-slate-400 truncate max-w-[220px]" title="${escapeHtml(item.note)}">
+                                            • ${escapeHtml(item.note)}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 shrink-0">
+                                <div class="text-right">
+                                    <div class="font-extrabold font-num text-xs sm:text-sm ${amountColor}">${amountStr}</div>
+                                </div>
+
+                                <div class="flex items-center gap-1">
+                                    <button onclick="openEntryModal('${item.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-700 flex items-center justify-center text-xs transition-colors" title="Edytuj pozycję">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button onclick="deleteEntry('${item.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 flex items-center justify-center text-xs transition-colors" title="Usuń pozycję">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }
+                }
+
+                const defaultSignVal = cat.defaultSign === 'plus' ? 'plus' : 'minus';
+                html += `
+                        </div>
+                    </div>
+
+                    <!-- Quick Add Footer inside Table -->
+                    <div class="p-3 bg-slate-50 border-t border-slate-200/80">
+                        <form onsubmit="quickAddFromTable(event, '${cat.id}')" class="flex flex-wrap sm:flex-nowrap items-center gap-1.5">
+                            <!-- Sign Selector (+ / -) -->
+                            <select id="quickSign-${cat.id}" aria-label="Plus lub Minus" class="rounded-xl border border-slate-300 bg-white px-2 py-2 text-xs font-extrabold ${defaultSignVal === 'plus' ? 'text-emerald-700' : 'text-rose-600'} focus:outline-none">
+                                <option value="plus" ${defaultSignVal === 'plus' ? 'selected' : ''}>+ Plus</option>
+                                <option value="minus" ${defaultSignVal === 'minus' ? 'selected' : ''}>− Minus</option>
+                            </select>
+
+                            <!-- Name input -->
+                            <input type="text" id="quickName-${cat.id}" required placeholder="Szybkie dodanie pozycji..." class="flex-1 min-w-[120px] rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 focus:outline-none focus:border-blue-600">
+
+                            <!-- Amount input -->
+                            <input type="number" id="quickAmount-${cat.id}" required min="0.01" step="0.01" placeholder="Kwota zł" class="w-24 rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs font-bold font-num text-slate-900 focus:outline-none focus:border-blue-600">
+
+                            <!-- Mode selector -->
+                            <select id="quickMode-${cat.id}" aria-label="Tryb obowiązywania" class="rounded-xl border border-slate-300 bg-white px-2 py-2 text-[11px] font-semibold text-slate-700 focus:outline-none">
+                                <option value="constant">Stałe</option>
+                                <option value="once">Jednorazowe (${MONTHS_SHORT_PL[m]})</option>
+                                <option value="until">Do końca roku</option>
+                            </select>
+
+                            <button type="submit" class="mat-btn px-3 py-2 rounded-xl ${styles.btn} font-bold text-xs flex items-center gap-1 shrink-0 shadow-xs" title="Szybko dodaj do tabeli">
+                                <i class="fa-solid fa-plus"></i>
+                                <span class="hidden sm:inline">Dodaj</span>
+                            </button>
+
+                            <button type="button" onclick="openEntryModal(null, '${cat.id}')" class="mat-btn px-2.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs shrink-0" title="Pełny formularz z wyborem dokładnej daty">
+                                <i class="fa-solid fa-calendar-plus"></i>
+                            </button>
+                        </form>
+                        ${hiddenInactiveCount > 0 && !showInactive ? `
+                            <div class="mt-2 text-[11px] text-slate-500 flex items-center justify-between px-1">
+                                <span>Ukryto ${hiddenInactiveCount} nieaktywnych pozycji w tym miesiącu</span>
+                                <button onclick="document.getElementById('toggleShowInactive').checked = true; renderAll();" class="text-blue-600 font-semibold hover:underline">Pokaż wszystkie</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </article>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function renderAnnualReport() {
+            const y = currentState.selectedYear;
+            const selectedM = currentState.selectedMonth;
+            const yStats = calculateYearTotals(y);
+
+            document.getElementById('annualReportYearTitle').textContent = `ROK ${y}`;
+
+            // 1. Render 12-Month Table Body
+            const tbody = document.getElementById('annualTableBody');
+            let rowsHtml = '';
+
+            for (const mRow of yStats.monthsData) {
+                const isSelectedMonth = mRow.monthIndex === selectedM;
+                const rowBg = isSelectedMonth
+                    ? 'bg-blue-50/90 font-semibold border-l-4 border-l-blue-600'
+                    : 'hover:bg-slate-50 cursor-pointer';
+                const netBadgeClass = mRow.netBalance >= 0
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                    : 'bg-rose-100 text-rose-800 border-rose-200';
+
+                rowsHtml += `
+                <tr onclick="selectMonthFromAnnual(${mRow.monthIndex})" class="${rowBg} transition-colors cursor-pointer" title="Kliknij, aby przejść do miesiąca ${mRow.monthName}">
+                    <td class="py-3 px-3 sm:px-4 font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg ${isSelectedMonth ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'} text-[11px] font-num flex items-center justify-center">
+                            ${mRow.monthIndex + 1}
+                        </span>
+                        <span>${mRow.monthName}</span>
+                        ${isSelectedMonth ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold">Wybrany</span>' : ''}
+                    </td>
+                    <td class="py-3 px-3 text-right font-num font-bold text-emerald-600">${formatPLN(mRow.totalIncome, true)}</td>
+                    <td class="py-3 px-3 text-right font-num text-slate-700">${formatPLN(mRow.foodExpense)}</td>
+                    <td class="py-3 px-3 text-right font-num text-slate-700">${formatPLN(mRow.homeExpense)}</td>
+                    <td class="py-3 px-3 text-right font-num text-slate-700">${formatPLN(mRow.otherExpense)}</td>
+                    <td class="py-3 px-3 text-right font-num font-bold text-rose-600">-${formatPLN(mRow.totalExpense)}</td>
+                    <td class="py-3 px-3 sm:px-4 text-right">
+                        <span class="inline-block font-num font-extrabold px-2.5 py-1 rounded-xl border text-xs ${netBadgeClass}">
+                            ${formatPLN(mRow.netBalance, true)}
+                        </span>
+                    </td>
+                </tr>
+                `;
+            }
+            tbody.innerHTML = rowsHtml;
+
+            // 2. Render Annual Table Footer
+            const tfoot = document.getElementById('annualTableFoot');
+            const yearNetClass = yStats.yearNet >= 0 ? 'text-emerald-400' : 'text-rose-400';
+            tfoot.innerHTML = `
+                <tr>
+                    <td class="py-4 px-3 sm:px-4 uppercase tracking-wider text-xs">RAZEM W ROKU ${y}</td>
+                    <td class="py-4 px-3 text-right font-num text-emerald-400">${formatPLN(yStats.yearIncome, true)}</td>
+                    <td class="py-4 px-3 text-right font-num text-amber-300">${formatPLN(yStats.yearFood)}</td>
+                    <td class="py-4 px-3 text-right font-num text-indigo-300">${formatPLN(yStats.yearHome)}</td>
+                    <td class="py-4 px-3 text-right font-num text-purple-300">${formatPLN(yStats.yearOther)}</td>
+                    <td class="py-4 px-3 text-right font-num text-rose-400">-${formatPLN(yStats.yearExpense)}</td>
+                    <td class="py-4 px-3 sm:px-4 text-right font-num text-base ${yearNetClass}">${formatPLN(yStats.yearNet, true)}</td>
+                </tr>
+            `;
+
+            // 3. Render Interactive 12-Month Bar Chart
+            const chartEl = document.getElementById('annualBarChart');
+            let maxVal = 1000;
+            for (const mRow of yStats.monthsData) {
+                if (mRow.totalIncome > maxVal) maxVal = mRow.totalIncome;
+                if (mRow.totalExpense > maxVal) maxVal = mRow.totalExpense;
+            }
+
+            let barsHtml = '';
+            for (const mRow of yStats.monthsData) {
+                const incPct = Math.max(4, Math.round((mRow.totalIncome / maxVal) * 100));
+                const expPct = Math.max(4, Math.round((mRow.totalExpense / maxVal) * 100));
+                const isSelected = mRow.monthIndex === selectedM;
+
+                barsHtml += `
+                <div onclick="selectMonthFromAnnual(${mRow.monthIndex})" class="flex-1 h-full flex flex-col justify-end items-center group cursor-pointer relative">
+                    <!-- Hover Tooltip -->
+                    <div class="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity absolute -top-2 left-1/2 -translate-x-1/2 z-20 bg-slate-900 text-white text-[10px] rounded-xl py-1.5 px-2.5 shadow-xl whitespace-nowrap border border-slate-700">
+                        <div class="font-bold text-blue-300">${mRow.monthName} ${y}</div>
+                        <div class="text-emerald-400">Zyski: ${formatPLN(mRow.totalIncome, true)}</div>
+                        <div class="text-rose-400">Koszty: -${formatPLN(mRow.totalExpense)}</div>
+                        <div class="font-bold border-t border-slate-700 mt-0.5 pt-0.5">Bilans: ${formatPLN(mRow.netBalance, true)}</div>
+                    </div>
+
+                    <div class="w-full h-[82%] flex items-end justify-center gap-0.5 sm:gap-1 px-0.5">
+                        <div class="w-1/2 bg-emerald-500 group-hover:bg-emerald-400 rounded-t-md transition-all duration-300" style="height: ${incPct}%"></div>
+                        <div class="w-1/2 bg-rose-500 group-hover:bg-rose-400 rounded-t-md transition-all duration-300" style="height: ${expPct}%"></div>
+                    </div>
+
+                    <span class="mt-2 text-[10px] sm:text-xs font-bold ${isSelected ? 'text-blue-600 underline' : 'text-slate-500'}">
+                        ${mRow.monthShort}
+                    </span>
+                </div>
+                `;
+            }
+            chartEl.innerHTML = barsHtml;
+
+            // 4. Render Annual Expense Donut Chart
+            const totalExp = yStats.yearExpense > 0 ? yStats.yearExpense : 1;
+            const foodPct = yStats.yearExpense > 0 ? Math.round((yStats.yearFood / totalExp) * 100) : 0;
+            const homePct = yStats.yearExpense > 0 ? Math.round((yStats.yearHome / totalExp) * 100) : 0;
+            const otherPct = yStats.yearExpense > 0 ? Math.max(0, 100 - foodPct - homePct) : 0;
+
+            const deg1 = Math.round((foodPct / 100) * 360);
+            const deg2 = deg1 + Math.round((homePct / 100) * 360);
+
+            document.getElementById('annualDonutContainer').innerHTML = `
+                <div class="w-40 h-40 rounded-full flex items-center justify-center shadow-inner relative"
+                     style="background: conic-gradient(#f59e0b 0deg ${deg1}deg, #6366f1 ${deg1}deg ${deg2}deg, #8b5cf6 ${deg2}deg 360deg);">
+                    <div class="w-28 h-28 rounded-full bg-white flex flex-col items-center justify-center text-center p-2 shadow-xs">
+                        <span class="text-[10px] font-bold uppercase text-slate-400">Koszty ${y}</span>
+                        <span class="text-xs sm:text-sm font-extrabold font-num text-slate-900 mt-0.5">${formatPLN(yStats.yearExpense)}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('annualBreakdownLegend').innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-2 font-semibold text-slate-700"><span class="w-3 h-3 rounded-full bg-amber-500"></span> Jedzenie</span>
+                    <span class="font-num font-bold text-slate-900">${formatPLN(yStats.yearFood)} (${foodPct}%)</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-2 font-semibold text-slate-700"><span class="w-3 h-3 rounded-full bg-indigo-500"></span> Koszty domu</span>
+                    <span class="font-num font-bold text-slate-900">${formatPLN(yStats.yearHome)} (${homePct}%)</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-2 font-semibold text-slate-700"><span class="w-3 h-3 rounded-full bg-purple-500"></span> Dodatkowe / Inne</span>
+                    <span class="font-num font-bold text-slate-900">${formatPLN(yStats.yearOther)} (${otherPct}%)</span>
+                </div>
+            `;
+
+            // 5. Render Timeline of Expiring ("until") Items
+            const untilItems = currentState.items.filter(i => i.mode === 'until');
+            const timelineEl = document.getElementById('expiringItemsTimeline');
+            if (untilItems.length === 0) {
+                timelineEl.innerHTML = `<div class="col-span-full text-xs text-slate-400 p-4 text-center">Brak pozycji z ustawionym trybem „Do określonej daty”.</div>`;
+            } else {
+                timelineEl.innerHTML = untilItems.map(item => {
+                    const ev = evaluateItemForMonth(item, y, selectedM);
+                    const isPlus = item.sign === 'plus';
+                    return `
+                        <div class="p-3.5 rounded-2xl border ${ev.active ? 'bg-purple-50/50 border-purple-200' : 'bg-slate-50 border-slate-200 opacity-75'} flex flex-col justify-between gap-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <span class="font-bold text-xs text-slate-800">${escapeHtml(item.name)}</span>
+                                <span class="font-num font-extrabold text-xs ${isPlus ? 'text-emerald-600' : 'text-rose-600'}">
+                                    ${isPlus ? '+' : '-'}${formatPLN(item.amount)}/mies.
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200/60">
+                                <span class="font-semibold text-purple-800"><i class="fa-solid fa-calendar-check mr-1"></i> Koniec: ${item.endDate || '-'}</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${ev.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">
+                                    ${ev.active ? 'Aktywne' : 'Wygasło'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderAll() {
+            renderDashboard();
+            renderTables();
+            renderAnnualReport();
+            saveToStorage();
+        }
+
+        function onPeriodChange() {
+            const m = parseInt(document.getElementById('selectMonth').value, 10);
+            const y = parseInt(document.getElementById('selectYear').value, 10);
+            currentState.selectedMonth = m;
+            currentState.selectedYear = y;
+            renderAll();
+        }
+
+        function changeMonth(delta) {
+            let m = currentState.selectedMonth + delta;
+            let y = currentState.selectedYear;
+            if (m < 0) {
+                m = 11;
+                y--;
+            } else if (m > 11) {
+                m = 0;
+                y++;
+            }
+            currentState.selectedMonth = m;
+            currentState.selectedYear = y;
+            populateYearSelect();
+            renderAll();
+        }
+
+        function resetToDefaultPeriod() {
+            currentState.selectedYear = 2026;
+            currentState.selectedMonth = 9; // Październik 2026
+            populateYearSelect();
+            renderAll();
+            showToast('Ustawiono okres: Październik 2026', 'info');
+        }
+
+        function selectMonthFromAnnual(monthIndex) {
+            currentState.selectedMonth = monthIndex;
+            switchTab('tables');
+            renderAll();
+            showToast(`Wybrano miesiąc: ${MONTHS_PL[monthIndex]} ${currentState.selectedYear}`, 'info');
+        }
+
+        function switchTab(tabName) {
+            currentState.activeTab = tabName;
+            const tabs = ['tables', 'annual', 'settings'];
+
+            for (const t of tabs) {
+                const viewEl = document.getElementById(`view-${t}`);
+                const desktopBtn = document.getElementById(`tabBtn-${t}`);
+                const mobBtn = document.getElementById(`mobNav-${t}`);
+                const mobPill = document.getElementById(`mobPill-${t}`);
+
+                if (t === tabName) {
+                    viewEl.classList.remove('hidden');
+                    desktopBtn.className = 'mat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-slate-900 text-white shadow-sm';
+                    mobBtn.className = 'flex flex-col items-center py-1 px-3 rounded-2xl text-blue-600 font-bold text-[11px]';
+                    mobPill.className = 'w-12 h-7 rounded-full bg-blue-100 flex items-center justify-center mb-0.5 transition-colors';
+                } else {
+                    viewEl.classList.add('hidden');
+                    desktopBtn.className = 'mat-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 text-slate-600 hover:bg-slate-100';
+                    mobBtn.className = 'flex flex-col items-center py-1 px-3 rounded-2xl text-slate-500 font-medium text-[11px]';
+                    mobPill.className = 'w-12 h-7 rounded-full flex items-center justify-center mb-0.5 transition-colors';
+                }
+            }
+        }
+
+        function populateCategorySelect(selectedCatId) {
+            const sel = document.getElementById('entryCategory');
+            sel.innerHTML = currentState.categories.map(c =>
+                `<option value="${c.id}" ${c.id === selectedCatId ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
+            ).join('');
+        }
+
+        function setEntrySign(sign) {
+            currentState.entrySign = sign;
+            const btnPlus = document.getElementById('btnTypePlus');
+            const btnMinus = document.getElementById('btnTypeMinus');
+
+            if (sign === 'plus') {
+                btnPlus.className = 'py-2.5 px-3 rounded-xl font-extrabold flex items-center justify-center gap-2 border-2 border-emerald-600 bg-emerald-50 text-emerald-800 shadow-xs';
+                btnMinus.className = 'py-2.5 px-3 rounded-xl font-semibold flex items-center justify-center gap-2 border-2 border-slate-200 bg-white text-slate-500';
+            } else {
+                btnMinus.className = 'py-2.5 px-3 rounded-xl font-extrabold flex items-center justify-center gap-2 border-2 border-rose-600 bg-rose-50 text-rose-800 shadow-xs';
+                btnPlus.className = 'py-2.5 px-3 rounded-xl font-semibold flex items-center justify-center gap-2 border-2 border-slate-200 bg-white text-slate-500';
+            }
+        }
+
+        function setRecurrenceMode(mode) {
+            currentState.entryMode = mode;
+            const modes = ['constant', 'once', 'until'];
+            for (const m of modes) {
+                const btn = document.getElementById(`modeBtn-${m}`);
+                if (m === mode) {
+                    btn.className = 'p-2.5 rounded-xl border-2 border-blue-600 bg-blue-50/70 text-left transition-all flex sm:flex-col items-center sm:items-start gap-2 sm:gap-1 shadow-xs';
+                } else {
+                    btn.className = 'p-2.5 rounded-xl border-2 border-slate-200 bg-white text-left transition-all flex sm:flex-col items-center sm:items-start gap-2 sm:gap-1 opacity-75 hover:opacity-100';
+                }
+            }
+
+            document.getElementById('fields-once').classList.toggle('hidden', mode !== 'once');
+            document.getElementById('fields-until').classList.toggle('hidden', mode !== 'until');
+        }
+
+        function onEntryCategoryChange() {
+            const catId = document.getElementById('entryCategory').value;
+            const cat = currentState.categories.find(c => c.id === catId);
+            if (cat) {
+                if (cat.defaultSign === 'plus') setEntrySign('plus');
+                else if (cat.defaultSign === 'minus') setEntrySign('minus');
+            }
+        }
+
+        function getSelectedMonthDefaultDateStr(day = '15') {
+            const y = currentState.selectedYear;
+            const m = String(currentState.selectedMonth + 1).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function openEntryModal(editId = null, preselectCategoryId = 'food') {
+            const modal = document.getElementById('entryModal');
+            const titleEl = document.getElementById('entryModalTitle');
+
+            if (editId) {
+                const item = currentState.items.find(i => i.id === editId);
+                if (!item) return;
+                titleEl.textContent = 'Edytuj pozycję';
+                document.getElementById('entryId').value = item.id;
+                populateCategorySelect(item.categoryId);
+                setEntrySign(item.sign);
+                document.getElementById('entryName').value = item.name;
+                document.getElementById('entryAmount').value = item.amount;
+                setRecurrenceMode(item.mode || 'constant');
+                document.getElementById('entryOnceDate').value = item.onceDate || getSelectedMonthDefaultDateStr('15');
+                document.getElementById('entryStartDate').value = item.startDate || `${currentState.selectedYear}-01-01`;
+                document.getElementById('entryEndDate').value = item.endDate || `${currentState.selectedYear}-12-31`;
+                document.getElementById('entryNote').value = item.note || '';
+            } else {
+                titleEl.textContent = 'Dodaj nową pozycję';
+                document.getElementById('entryId').value = '';
+                populateCategorySelect(preselectCategoryId);
+                const cat = currentState.categories.find(c => c.id === preselectCategoryId);
+                setEntrySign(cat && cat.defaultSign === 'plus' ? 'plus' : 'minus');
+                document.getElementById('entryName').value = '';
+                document.getElementById('entryAmount').value = '';
+                setRecurrenceMode('constant');
+                document.getElementById('entryOnceDate').value = getSelectedMonthDefaultDateStr('15');
+                document.getElementById('entryStartDate').value = `${currentState.selectedYear}-${String(currentState.selectedMonth + 1).padStart(2, '0')}-01`;
+                document.getElementById('entryEndDate').value = `${currentState.selectedYear}-12-31`;
+                document.getElementById('entryNote').value = '';
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('entryName').focus(), 80);
+        }
+
+        function closeEntryModal() {
+            document.getElementById('entryModal').classList.add('hidden');
+        }
+
+        function saveEntryForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('entryId').value;
+            const categoryId = document.getElementById('entryCategory').value;
+            const name = document.getElementById('entryName').value.trim();
+            const amount = parseFloat(document.getElementById('entryAmount').value);
+            const note = document.getElementById('entryNote').value.trim();
+            const mode = currentState.entryMode;
+            const sign = currentState.entrySign;
+
+            if (!name || isNaN(amount) || amount <= 0) {
+                showToast('Podaj prawidłową nazwę oraz kwotę większą od 0', 'error');
+                return;
+            }
+
+            const onceDate = mode === 'once' ? (document.getElementById('entryOnceDate').value || getSelectedMonthDefaultDateStr('15')) : '';
+            const startDate = mode === 'until' ? document.getElementById('entryStartDate').value : '';
+            const endDate = mode === 'until' ? (document.getElementById('entryEndDate').value || `${currentState.selectedYear}-12-31`) : '';
+
+            if (id) {
+                const idx = currentState.items.findIndex(i => i.id === id);
+                if (idx !== -1) {
+                    currentState.items[idx] = {
+                        ...currentState.items[idx],
+                        categoryId,
+                        name,
+                        amount,
+                        sign,
+                        mode,
+                        onceDate,
+                        startDate,
+                        endDate,
+                        note
+                    };
+                }
+                showToast(`Zaktualizowano: ${name}`, 'success');
+            } else {
+                currentState.items.push({
+                    id: 'item-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                    categoryId,
+                    name,
+                    amount,
+                    sign,
+                    mode,
+                    onceDate,
+                    startDate,
+                    endDate,
+                    note
+                });
+                showToast(`Dodano pozycję: ${name}`, 'success');
+            }
+
+            closeEntryModal();
+            renderAll();
+        }
+
+        function quickAddFromTable(e, categoryId) {
+            e.preventDefault();
+            const sign = document.getElementById(`quickSign-${categoryId}`).value;
+            const nameEl = document.getElementById(`quickName-${categoryId}`);
+            const amountEl = document.getElementById(`quickAmount-${categoryId}`);
+            const mode = document.getElementById(`quickMode-${categoryId}`).value;
+
+            const name = nameEl.value.trim();
+            const amount = parseFloat(amountEl.value);
+            if (!name || isNaN(amount) || amount <= 0) return;
+
+            const onceDate = mode === 'once' ? getSelectedMonthDefaultDateStr('15') : '';
+            const startDate = mode === 'until' ? `${currentState.selectedYear}-${String(currentState.selectedMonth + 1).padStart(2, '0')}-01` : '';
+            const endDate = mode === 'until' ? `${currentState.selectedYear}-12-31` : '';
+
+            currentState.items.push({
+                id: 'item-' + Date.now(),
+                categoryId,
+                name,
+                amount,
+                sign,
+                mode,
+                onceDate,
+                startDate,
+                endDate,
+                note: ''
+            });
+
+            nameEl.value = '';
+            amountEl.value = '';
+            renderAll();
+            showToast(`Dodano: ${name} (${formatPLN(amount)})`, 'success');
+        }
+
+        function deleteEntry(id) {
+            const item = currentState.items.find(i => i.id === id);
+            if (!item) return;
+            currentState.items = currentState.items.filter(i => i.id !== id);
+            renderAll();
+            showToast(`Usunięto pozycję: ${item.name}`, 'info');
+        }
+
+        function openCategoryModal() {
+            document.getElementById('catName').value = '';
+            document.getElementById('categoryModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('catName').focus(), 80);
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
+        }
+
+        function saveCustomCategory(e) {
+            e.preventDefault();
+            const name = document.getElementById('catName').value.trim();
+            const defaultSign = document.getElementById('catDefaultSign').value;
+            const icon = document.getElementById('catIcon').value;
+
+            if (!name) return;
+            const newCat = {
+                id: 'cat-' + Date.now(),
+                name,
+                subtitle: 'Własna tabela z możliwością dodawania pól na + i -',
+                defaultSign,
+                icon,
+                theme: defaultSign === 'plus' ? 'emerald' : 'purple',
+                system: false
+            };
+
+            currentState.categories.push(newCat);
+            closeCategoryModal();
+            switchTab('tables');
+            renderAll();
+            showToast(`Utworzono własną tabelę: ${name}`, 'success');
+        }
+
+        function confirmDeleteCategory(catId) {
+            const cat = currentState.categories.find(c => c.id === catId);
+            if (!cat || cat.system) return;
+
+            openConfirmModal(
+                'Usuń własną tabelę',
+                `Czy na pewno chcesz usunąć tabelę „${cat.name}” oraz wszystkie przypisane do niej pozycje?`,
+                () => {
+                    currentState.categories = currentState.categories.filter(c => c.id !== catId);
+                    currentState.items = currentState.items.filter(i => i.categoryId !== catId);
+                    renderAll();
+                    showToast(`Usunięto tabelę: ${cat.name}`, 'info');
+                }
+            );
+        }
+
+        // Backup & Export Functions
+        function exportBackupJSON() {
+            const dataStr = JSON.stringify({
+                app: 'Kalkulator Kosztów Życia PWA',
+                exportedAt: new Date().toISOString(),
+                selectedYear: currentState.selectedYear,
+                selectedMonth: currentState.selectedMonth,
+                categories: currentState.categories,
+                items: currentState.items
+            }, null, 2);
+
+            const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `koszty_zycia_kopia_${currentState.selectedYear}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Pobrano plik kopii zapasowej (.JSON)', 'success');
+        }
+
+        function importBackupJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed.categories) && Array.isArray(parsed.items)) {
+                        currentState.categories = parsed.categories;
+                        currentState.items = parsed.items;
+                        if (typeof parsed.selectedYear === 'number') currentState.selectedYear = parsed.selectedYear;
+                        if (typeof parsed.selectedMonth === 'number') currentState.selectedMonth = parsed.selectedMonth;
+                        populateYearSelect();
+                        renderAll();
+                        showToast('Pomyślnie wczytano kopię zapasową!', 'success');
+                    } else {
+                        showToast('Nieprawidłowy format pliku kopii zapasowej', 'error');
+                    }
+                } catch (err) {
+                    showToast('Błąd odczytu pliku JSON', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function exportAnnualCSV() {
+            const y = currentState.selectedYear;
+            const yStats = calculateYearTotals(y);
+
+            let csv = '\uFEFF'; // UTF-8 BOM for Excel Polish characters
+            csv += `Zestawienie Roczne Kosztow Zycia - Rok ${y}\n`;
+            csv += `Miesiac;Zyski (+);Jedzenie (-);Koszty Domu (-);Dodatkowe Koszty (-);Suma Kosztow (-);Bilans Miesiaca (Zysk/Strata)\n`;
+
+            for (const m of yStats.monthsData) {
+                csv += `${m.monthName};${m.totalIncome.toFixed(2).replace('.', ',')};${m.foodExpense.toFixed(2).replace('.', ',')};${m.homeExpense.toFixed(2).replace('.', ',')};${m.otherExpense.toFixed(2).replace('.', ',')};${m.totalExpense.toFixed(2).replace('.', ',')};${m.netBalance.toFixed(2).replace('.', ',')}\n`;
+            }
+
+            csv += `RAZEM ${y};${yStats.yearIncome.toFixed(2).replace('.', ',')};${yStats.yearFood.toFixed(2).replace('.', ',')};${yStats.yearHome.toFixed(2).replace('.', ',')};${yStats.yearOther.toFixed(2).replace('.', ',')};${yStats.yearExpense.toFixed(2).replace('.', ',')};${yStats.yearNet.toFixed(2).replace('.', ',')}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zestawienie_roczne_${y}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Pobrano zestawienie roczne ${y} (.CSV)`, 'success');
+        }
+
+        function openConfirmModal(title, message, onConfirm) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            const btn = document.getElementById('confirmActionBtn');
+            btn.onclick = () => {
+                closeConfirmModal();
+                onConfirm();
+            };
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        function confirmClearAllData() {
+            openConfirmModal(
+                'Wyczyścić wszystkie pozycje?',
+                'Wszystkie wpisane zyski i koszty zostaną usunięte, a tabele będą puste i gotowe do własnego uzupełnienia.',
+                () => {
+                    currentState.categories = getDefaultCategories();
+                    currentState.items = [];
+                    renderAll();
+                    switchTab('tables');
+                    showToast('Wyczyszczono wszystkie pozycje z kalkulatora', 'info');
+                }
+            );
+        }
+
+        function confirmRestoreDemoData() {
+            openConfirmModal(
+                'Przywrócić dane przykładowe?',
+                'Twoje obecne wpisy zostaną zastąpione zestawem przykładowych zysków i kosztów na rok 2026.',
+                () => {
+                    currentState.categories = getDefaultCategories();
+                    currentState.items = getDefaultItems();
+                    currentState.selectedYear = 2026;
+                    currentState.selectedMonth = 9;
+                    populateYearSelect();
+                    renderAll();
+                    switchTab('tables');
+                    showToast('Przywrócono dane przykładowe (Październik 2026)', 'success');
+                }
+            );
+        }
+
+        function openPwaModal() {
+            document.getElementById('pwaModal').classList.remove('hidden');
+        }
+
+        function closePwaModal() {
+            document.getElementById('pwaModal').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-slate-900 text-emerald-400 border-emerald-500/40',
+                error: 'bg-rose-950 text-rose-200 border-rose-500/40',
+                info: 'bg-slate-900 text-blue-300 border-blue-500/40'
+            };
+            const icons = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-exclamation',
+                info: 'fa-circle-info'
+            };
+
+            toast.className = `px-4 py-2.5 rounded-2xl shadow-xl border text-xs font-bold flex items-center gap-2 animate-fade-in ${colors[type] || colors.info}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i> <span class="text-white">${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.25s ease';
+                setTimeout(() => toast.remove(), 250);
+            }, 2600);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function populateYearSelect() {
+            const sel = document.getElementById('selectYear');
+            const currentY = currentState.selectedYear;
+            const startY = Math.min(2024, currentY - 2);
+            const endY = Math.max(2032, currentY + 4);
+            let html = '';
+            for (let y = startY; y <= endY; y++) {
+                html += `<option value="${y}" ${y === currentY ? 'selected' : ''}>${y}</option>`;
+            }
+            sel.innerHTML = html;
+        }
+
+        let deferredPwaPrompt = null;
+
+        function generateCanvasIconDataUrl(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Background #0f172a
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, size, size);
+
+            // Inner emerald rounded square
+            const pad = Math.round(size * 0.12);
+            const boxSize = size - pad * 2;
+            const r = Math.round(size * 0.2);
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.roundRect(pad, pad, boxSize, boxSize, r);
+            ctx.fill();
+
+            // Wallet icon symbol
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.roundRect(Math.round(size * 0.24), Math.round(size * 0.32), Math.round(size * 0.52), Math.round(size * 0.40), Math.round(size * 0.07));
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(Math.round(size * 0.64), Math.round(size * 0.52), Math.round(size * 0.045), 0, Math.PI * 2);
+            ctx.fill();
+
+            return canvas.toDataURL('image/png');
+        }
+
+        function triggerNativePwaInstall() {
+            if (deferredPwaPrompt) {
+                deferredPwaPrompt.prompt();
+                deferredPwaPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast('Rozpoczęto instalację aplikacji PWA!', 'success');
+                    }
+                    deferredPwaPrompt = null;
+                    closePwaModal();
+                });
+            } else {
+                openPwaModal();
+            }
+        }
+
+        // Register Service Worker and handle native Android installation prompt
+        function initPWAFeatures() {
+            try {
+                const isLocalFile = window.location.protocol === 'file:' || window.location.protocol === 'content:';
+                const warnBox = document.getElementById('localFileWarningBox');
+                if (isLocalFile && warnBox) {
+                    warnBox.classList.remove('hidden');
+                }
+
+                if ('serviceWorker' in navigator && !isLocalFile) {
+                    navigator.serviceWorker.register('./sw.js').catch((err) => {
+                        console.warn('SW registration warning:', err);
+                    });
+                }
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPwaPrompt = e;
+                    const nativeBox = document.getElementById('nativeInstallBox');
+                    if (nativeBox) nativeBox.classList.remove('hidden');
+                    showToast('Aplikacja gotowa do instalacji!', 'info');
+                });
+            } catch (e) {
+                console.warn('PWA init warning:', e);
+            }
+        }
+
+        // ==========================================================
+        // SKANER PARAGONÓW (APARAT + OCR TESSERACT + GEMINI VISION)
+        // ==========================================================
+        const GEMINI_KEY_STORAGE = 'kalkulator_kosztow_gemini_api_key';
+        let liveCameraStream = null;
+        let currentReceiptImportMode = 'single';
+        let currentDetectedLineItems = [];
+
+        const POLISH_STORES_DB = [
+            { keywords: ['biedronka', 'jeronimo', 'martins'], name: 'Biedronka', categoryId: 'food' },
+            { keywords: ['lidl'], name: 'Lidl', categoryId: 'food' },
+            { keywords: ['żabka', 'zabka'], name: 'Żabka', categoryId: 'food' },
+            { keywords: ['kaufland'], name: 'Kaufland', categoryId: 'food' },
+            { keywords: ['auchan'], name: 'Auchan', categoryId: 'food' },
+            { keywords: ['carrefour'], name: 'Carrefour', categoryId: 'food' },
+            { keywords: ['dino'], name: 'Dino', categoryId: 'food' },
+            { keywords: ['netto'], name: 'Netto', categoryId: 'food' },
+            { keywords: ['stokrotka'], name: 'Stokrotka', categoryId: 'food' },
+            { keywords: ['lewiatan'], name: 'Lewiatan', categoryId: 'food' },
+            { keywords: ['intermarche', 'intermarché'], name: 'Intermarché', categoryId: 'food' },
+            { keywords: ['delikatesy centrum'], name: 'Delikatesy Centrum', categoryId: 'food' },
+            { keywords: ['piekarnia', 'cukiernia', 'putka', 'oskroba'], name: 'Piekarnia / Cukiernia', categoryId: 'food' },
+            { keywords: ['mcdonald', 'kfc', 'burger king', 'pizzeria', 'restauracja', 'kebab', 'bistro'], name: 'Jedzenie na mieście', categoryId: 'food' },
+            { keywords: ['rossmann'], name: 'Rossmann (Chemia i Dom)', categoryId: 'home' },
+            { keywords: ['hebe'], name: 'Hebe', categoryId: 'home' },
+            { keywords: ['castorama'], name: 'Castorama (Dom)', categoryId: 'home' },
+            { keywords: ['leroy', 'merlin'], name: 'Leroy Merlin (Dom)', categoryId: 'home' },
+            { keywords: ['ikea'], name: 'IKEA (Dom)', categoryId: 'home' },
+            { keywords: ['obi'], name: 'OBI (Dom)', categoryId: 'home' },
+            { keywords: ['action'], name: 'Action (Dom)', categoryId: 'home' },
+            { keywords: ['pepco'], name: 'Pepco (Dom)', categoryId: 'home' },
+            { keywords: ['tedi'], name: 'TEDi', categoryId: 'home' },
+            { keywords: ['orlen', 'pkn orlen'], name: 'Stacja Paliw Orlen', categoryId: 'custom' },
+            { keywords: ['circle k', 'circle-k'], name: 'Stacja Paliw Circle K', categoryId: 'custom' },
+            { keywords: ['shell'], name: 'Stacja Paliw Shell', categoryId: 'custom' },
+            { keywords: ['bp ', 'bp europa', 'moya', 'amic'], name: 'Stacja Paliw', categoryId: 'custom' },
+            { keywords: ['apteka', 'doz ', 'ziko', 'super-pharm'], name: 'Apteka / Zdrowie', categoryId: 'custom' }
+        ];
+
+        function populateScannerCategorySelect(selectedCatId = 'food') {
+            const sel = document.getElementById('scannedCategorySelect');
+            if (!sel) return;
+            sel.innerHTML = currentState.categories
+                .filter(c => c.id !== 'income')
+                .map(c => `<option value="${c.id}" ${c.id === selectedCatId ? 'selected' : ''}>${escapeHtml(c.name)}</option>`)
+                .join('');
+        }
+
+        function openReceiptScannerModal() {
+            populateScannerCategorySelect('food');
+            const savedKey = localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+            const keyInput = document.getElementById('geminiApiKeyInput');
+            if (keyInput) keyInput.value = savedKey;
+            updateAiKeyBadge();
+
+            // Set default date to today if in selected month, or 15th of selected month
+            const now = new Date();
+            let defaultDate = getSelectedMonthDefaultDateStr(String(now.getDate()).padStart(2, '0'));
+            document.getElementById('scannedDateInput').value = defaultDate;
+
+            document.getElementById('receiptScannerModal').classList.remove('hidden');
+        }
+
+        function closeReceiptScannerModal() {
+            stopLiveCameraStream();
+            document.getElementById('receiptScannerModal').classList.add('hidden');
+        }
+
+        function toggleScannerAiSettings() {
+            const box = document.getElementById('scannerAiSettingsBox');
+            box.classList.toggle('hidden');
+        }
+
+        function updateAiKeyBadge() {
+            const key = localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+            const badge = document.getElementById('aiKeyStatusBadge');
+            if (!badge) return;
+            if (key.trim().length > 10) {
+                badge.textContent = 'Aktywny: Gemini Vision AI';
+                badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold';
+            } else {
+                badge.textContent = 'Tryb lokalny OCR (Darmowy)';
+                badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300';
+            }
+        }
+
+        function saveGeminiApiKey() {
+            const val = document.getElementById('geminiApiKeyInput').value.trim();
+            if (val) {
+                localStorage.setItem(GEMINI_KEY_STORAGE, val);
+                showToast('Zapisano klucz Gemini AI do skanowania paragonów!', 'success');
+            } else {
+                localStorage.removeItem(GEMINI_KEY_STORAGE);
+                showToast('Usunięto klucz AI – aktywny wbudowany darmowy skaner OCR', 'info');
+            }
+            updateAiKeyBadge();
+            document.getElementById('scannerAiSettingsBox').classList.add('hidden');
+        }
+
+        async function startLiveCameraStream() {
+            const container = document.getElementById('liveCameraContainer');
+            const video = document.getElementById('liveCameraVideo');
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showToast('Użyj przycisku „Aparat (Zrób zdjęcie)” powyżej', 'info');
+                    document.getElementById('receiptCameraInput').click();
+                    return;
+                }
+                liveCameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    },
+                    audio: false
+                });
+                video.srcObject = liveCameraStream;
+                container.classList.remove('hidden');
+            } catch (err) {
+                console.warn('Camera stream fallback:', err);
+                document.getElementById('receiptCameraInput').click();
+            }
+        }
+
+        function stopLiveCameraStream() {
+            if (liveCameraStream) {
+                liveCameraStream.getTracks().forEach(track => track.stop());
+                liveCameraStream = null;
+            }
+            const container = document.getElementById('liveCameraContainer');
+            if (container) container.classList.add('hidden');
+        }
+
+        function captureFrameFromLiveCamera() {
+            const video = document.getElementById('liveCameraVideo');
+            if (!video || !video.videoWidth) return;
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            stopLiveCameraStream();
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+            processReceiptImageDataUrl(dataUrl);
+        }
+
+        function handleReceiptFileSelect(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            stopLiveCameraStream();
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                processReceiptImageDataUrl(e.target.result);
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        // Preprocesses receipt photo (resizes + increases contrast for crisp OCR on thermal paper)
+        function preprocessReceiptImage(dataUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const maxDim = 1800;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) {
+                            h = Math.round((h * maxDim) / w);
+                            w = maxDim;
+                        } else {
+                            w = Math.round((w * maxDim) / h);
+                            h = maxDim;
+                        }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    // Enhance contrast & convert to clean high-contrast grayscale for Tesseract
+                    const imgData = ctx.getImageData(0, 0, w, h);
+                    const d = imgData.data;
+                    const contrast = 1.45;
+                    const intercept = 128 * (1 - contrast);
+                    for (let i = 0; i < d.length; i += 4) {
+                        const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+                        let c = gray * contrast + intercept;
+                        c = Math.max(0, Math.min(255, c));
+                        d[i] = d[i + 1] = d[i + 2] = c;
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                };
+                img.onerror = () => resolve(dataUrl);
+                img.src = dataUrl;
+            });
+        }
+
+        function setScanProgress(pct, title, subtitle) {
+            document.getElementById('scanProgressSection').classList.remove('hidden');
+            document.getElementById('scanProgressBar').style.width = `${Math.max(5, Math.min(100, pct))}%`;
+            document.getElementById('scanProgressPct').textContent = `${Math.round(pct)}%`;
+            if (title) document.getElementById('scanStatusTitle').innerHTML = title;
+            if (subtitle) document.getElementById('scanStatusSubtitle').textContent = subtitle;
+        }
+
+        async function processReceiptImageDataUrl(rawDataUrl) {
+            document.getElementById('receiptPreviewThumb').src = rawDataUrl;
+            document.getElementById('scannedResultForm').classList.add('hidden');
+            setScanProgress(10, '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Przygotowywanie zdjęcia paragonu...', 'Wyostrzanie druku fiskalnego...');
+
+            const apiKey = (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
+            if (apiKey.length > 10) {
+                const aiSuccess = await tryScanWithGeminiAI(rawDataUrl, apiKey);
+                if (aiSuccess) return;
+            }
+
+            // Default: Local in-browser OCR via Tesseract.js (Polish + English)
+            try {
+                const processedDataUrl = await preprocessReceiptImage(rawDataUrl);
+                setScanProgress(20, '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Uruchamianie silnika OCR (Polski)...', 'Pobieranie słownika i odczyt tekstu...');
+
+                if (typeof Tesseract === 'undefined') {
+                    throw new Error('Brak biblioteki Tesseract (sprawdź połączenie z internetem)');
+                }
+
+                const result = await Tesseract.recognize(processedDataUrl, 'pol', {
+                    logger: (m) => {
+                        if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+                            const p = 25 + Math.round(m.progress * 70);
+                            setScanProgress(p, '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Odczytywanie kwot z paragonu...', 'Analiza wierszy i sekcji SUMA PLN...');
+                        }
+                    }
+                });
+
+                const rawText = (result && result.data && result.data.text) ? result.data.text : '';
+                const parsed = parsePolishReceiptText(rawText);
+                displayParsedReceiptResult(parsed, rawText, 'OCR Lokalny');
+            } catch (err) {
+                console.error('OCR Error:', err);
+                setScanProgress(100, '<i class="fa-solid fa-circle-exclamation text-amber-600"></i> Wpisz kwotę ręcznie (podgląd gotowy)', 'Nie udało się automatycznie odczytać druku – uzupełnij kwotę poniżej.');
+                displayParsedReceiptResult({
+                    storeName: 'Zakupy z paragonu',
+                    categoryId: 'food',
+                    totalAmount: '',
+                    otherAmounts: [],
+                    dateStr: '',
+                    items: []
+                }, '', 'Ręczna korekta');
+            }
+        }
+
+        async function tryScanWithGeminiAI(dataUrl, apiKey) {
+            try {
+                setScanProgress(35, '<i class="fa-solid fa-wand-magic-sparkles fa-spin text-amber-500"></i> Analiza paragonu przez Gemini Vision AI...', 'Rozpoznawanie sklepu, sumy i produktów...');
+                const base64Data = dataUrl.split(',')[1];
+                const mimeType = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';')) || 'image/jpeg';
+
+                const prompt = `Przeanalizuj zdjęcie polskiego paragonu fiskalnego i zwróć WYŁĄCZNIE poprawny obiekt JSON (bez znaczników markdown) w formacie:
+{
+  "storeName": "Nazwa sklepu np. Biedronka, Lidl, Orlen, Rossmann",
+  "categoryId": "food (jedzenie/spożywcze) LUB home (dom/chemia/remont) LUB custom (paliwo/apteka/inne)",
+  "totalAmount": 0.00,
+  "dateStr": "YYYY-MM-DD (lub pusty ciąg jeśli brak)",
+  "items": [
+    {"name": "Nazwa produktu z paragonu", "price": 0.00}
+  ]
+}`;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: prompt },
+                                { inline_data: { mime_type: mimeType, data: base64Data } }
+                            ]
+                        }],
+                        generationConfig: {
+                            response_mime_type: "application/json"
+                        }
+                    })
+                });
+
+                if (!response.ok) throw new Error('API status ' + response.status);
+                const data = await response.json();
+                const textOut = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const cleanedJson = textOut.replace(/```json|```/g, '').trim();
+                const aiObj = JSON.parse(cleanedJson);
+
+                const parsed = {
+                    storeName: aiObj.storeName ? `Paragon: ${aiObj.storeName}` : 'Zakupy z paragonu',
+                    categoryId: ['food', 'home', 'custom'].includes(aiObj.categoryId) ? aiObj.categoryId : 'food',
+                    totalAmount: Number(aiObj.totalAmount) || '',
+                    otherAmounts: [],
+                    dateStr: aiObj.dateStr || '',
+                    items: Array.isArray(aiObj.items) ? aiObj.items : []
+                };
+                displayParsedReceiptResult(parsed, JSON.stringify(aiObj, null, 2), 'Gemini Vision AI');
+                return true;
+            } catch (e) {
+                console.warn('Gemini AI fallback to local OCR:', e);
+                return false;
+            }
+        }
+
+        // Intelligent Polish Fiscal Receipt Parser
+        function parsePolishReceiptText(rawText) {
+            const text = String(rawText || '');
+            const lower = text.toLowerCase();
+            const lines = text.split(/?
+/).map(l => l.trim()).filter(Boolean);
+
+            // 1. Detect Store Name & Category
+            let detectedStore = 'Zakupy z paragonu';
+            let detectedCategory = 'food';
+            for (const store of POLISH_STORES_DB) {
+                if (store.keywords.some(kw => lower.includes(kw))) {
+                    detectedStore = `Paragon: ${store.name}`;
+                    detectedCategory = store.categoryId;
+                    break;
+                }
+            }
+
+            // 2. Detect Receipt Date (YYYY-MM-DD or DD-MM-YYYY or DD.MM.YYYY)
+            let detectedDate = '';
+            const isoMatch = text.match(/(202[4-9])[-./](0[1-9]|1[0-2])[-./](0[1-9]|[12]\d|3[01])/);
+            const dmyMatch = text.match(/(0[1-9]|[12]\d|3[01])[-./](0[1-9]|1[0-2])[-./](202[4-9])/);
+            if (isoMatch) {
+                detectedDate = `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+            } else if (dmyMatch) {
+                detectedDate = `${dmyMatch[3]}-${dmyMatch[2]}-${dmyMatch[1]}`;
+            }
+
+            // 3. Extract Total Amount (SUMA PLN / DO ZAPŁATY / RAZEM / KWOTA)
+            const totalKeywords = ['suma pln', 'suma:', 'suma ', 'do zapłaty', 'do zaplaty', 'razem', 'wartość', 'wartosc', 'płatność', 'platnosc', 'karta', 'gotówka', 'gotowka'];
+            let primaryTotal = null;
+            const allAmountsSet = new Set();
+
+            // Helper to extract decimal prices like 12,99 or 145.50 from a line
+            const extractPricesFromLine = (line) => {
+                const normalized = line.replace(/(\d)\s+[,.]\s*(\d{2})/g, '$1,$2');
+                const matches = [...normalized.matchAll(/(\d{1,5})[,.](\d{2})/g)];
+                return matches.map(m => parseFloat(`${m[1]}.${m[2]}`)).filter(v => v > 0 && v < 50000 && ![2024, 2025, 2026, 2027, 23.00, 8.00, 5.00].includes(v));
+            };
+
+            const detectedItems = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const lLow = line.toLowerCase();
+                const prices = extractPricesFromLine(line);
+                prices.forEach(p => allAmountsSet.add(p.toFixed(2)));
+
+                // Check if this line is the SUMA PLN line
+                if (totalKeywords.some(kw => lLow.includes(kw))) {
+                    if (prices.length > 0 && primaryTotal === null) {
+                        primaryTotal = Math.max(...prices);
+                    } else if (prices.length === 0 && i + 1 < lines.length && primaryTotal === null) {
+                        const nextPrices = extractPricesFromLine(lines[i + 1]);
+                        if (nextPrices.length > 0) primaryTotal = Math.max(...nextPrices);
+                    }
+                } else if (prices.length > 0) {
+                    // Check if it looks like a product line item (has letters and ends with a price)
+                    const cleanName = line.replace(/\d+[,.]\d{2}.*$/, '').replace(/[*xX]\s*\d+([,.]\d+)?.*$/, '').trim();
+                    const ignoreWords = ['ptu', 'podatek', 'vat', 'sprzedaż', 'sprzedaz', 'opodatkowana', 'reszta', 'nip', 'paragon', 'fiskalny', 'kasjer', 'nr ', 'kasa'];
+                    if (cleanName.length >= 3 && !ignoreWords.some(w => cleanName.toLowerCase().includes(w))) {
+                        const itemPrice = prices[prices.length - 1];
+                        detectedItems.push({ name: cleanName.slice(0, 45), price: itemPrice });
+                    }
+                }
+            }
+
+            const sortedUniqueAmounts = [...allAmountsSet].map(Number).sort((a, b) => b - a);
+            if (primaryTotal === null && sortedUniqueAmounts.length > 0) {
+                primaryTotal = sortedUniqueAmounts[0];
+            }
+
+            return {
+                storeName: detectedStore,
+                categoryId: detectedCategory,
+                totalAmount: primaryTotal !== null ? primaryTotal.toFixed(2) : '',
+                otherAmounts: sortedUniqueAmounts.slice(0, 6),
+                dateStr: detectedDate,
+                items: detectedItems.slice(0, 25)
+            };
+        }
+
+        function displayParsedReceiptResult(parsed, rawText, engineLabel) {
+            setScanProgress(100, `<i class="fa-solid fa-circle-check text-emerald-600"></i> Zakończono skanowanie (${engineLabel})`, 'Sprawdź odczytaną kwotę poniżej i zatwierdź.');
+
+            document.getElementById('scannedResultForm').classList.remove('hidden');
+            document.getElementById('detectedStoreBadge').textContent = engineLabel;
+            document.getElementById('scannedAmountInput').value = parsed.totalAmount || '';
+            document.getElementById('scannedNameInput').value = parsed.storeName || 'Zakupy z paragonu';
+            populateScannerCategorySelect(parsed.categoryId || 'food');
+
+            if (parsed.dateStr) {
+                document.getElementById('scannedDateInput').value = parsed.dateStr;
+            }
+
+            document.getElementById('rawOcrTextOutput').textContent = rawText || 'Brak surowego tekstu.';
+
+            // Render clickable chips of other detected numbers on the receipt
+            const chipsBox = document.getElementById('otherDetectedAmountsBox');
+            const chipsContainer = document.getElementById('otherDetectedAmountsChips');
+            if (parsed.otherAmounts && parsed.otherAmounts.length > 0) {
+                chipsBox.classList.remove('hidden');
+                chipsContainer.innerHTML = parsed.otherAmounts.map(val => {
+                    const fVal = Number(val).toFixed(2);
+                    return `<button type="button" onclick="document.getElementById('scannedAmountInput').value='${fVal}'" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-800 hover:text-blue-800 font-num font-bold text-xs border border-slate-300 transition-colors">${fVal.replace('.', ',')} zł</button>`;
+                }).join('');
+            } else {
+                chipsBox.classList.add('hidden');
+            }
+
+            // Populate multi-items checklist if line items were detected
+            currentDetectedLineItems = parsed.items || [];
+            const modeWrapper = document.getElementById('scanImportModeWrapper');
+            const countSpan = document.getElementById('detectedItemsCount');
+            const checklist = document.getElementById('scannedItemsChecklist');
+
+            if (currentDetectedLineItems.length > 0) {
+                modeWrapper.classList.remove('hidden');
+                countSpan.textContent = String(currentDetectedLineItems.length);
+                checklist.innerHTML = currentDetectedLineItems.map((it, idx) => `
+                    <label class="flex items-center justify-between gap-2 p-2 rounded-lg bg-white border border-slate-200 cursor-pointer">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <input type="checkbox" checked data-item-idx="${idx}" class="scanned-item-checkbox rounded text-blue-600 w-4 h-4 accent-blue-600">
+                            <span class="font-semibold text-xs text-slate-800 truncate">${escapeHtml(it.name)}</span>
+                        </div>
+                        <span class="font-num font-bold text-xs text-rose-600 shrink-0">-${formatPLN(it.price)}</span>
+                    </label>
+                `).join('');
+            } else {
+                modeWrapper.classList.add('hidden');
+            }
+
+            setReceiptImportMode('single');
+        }
+
+        function setReceiptImportMode(mode) {
+            currentReceiptImportMode = mode;
+            const btnSingle = document.getElementById('btnImportModeSingle');
+            const btnItems = document.getElementById('btnImportModeItems');
+            const singleFields = document.getElementById('singleReceiptFields');
+            const multiFields = document.getElementById('multiItemsReceiptFields');
+
+            if (mode === 'single') {
+                btnSingle.className = 'py-1.5 px-2 rounded-lg font-bold text-xs bg-white text-slate-900 shadow-xs';
+                btnItems.className = 'py-1.5 px-2 rounded-lg font-semibold text-xs text-slate-600';
+                singleFields.classList.remove('hidden');
+                multiFields.classList.add('hidden');
+            } else {
+                btnItems.className = 'py-1.5 px-2 rounded-lg font-bold text-xs bg-white text-slate-900 shadow-xs';
+                btnSingle.className = 'py-1.5 px-2 rounded-lg font-semibold text-xs text-slate-600';
+                singleFields.classList.add('hidden');
+                multiFields.classList.remove('hidden');
+            }
+        }
+
+        function saveScannedReceiptExpense(e) {
+            e.preventDefault();
+            const categoryId = document.getElementById('scannedCategorySelect').value || 'food';
+            const dateVal = document.getElementById('scannedDateInput').value || getSelectedMonthDefaultDateStr('15');
+
+            // Automatically switch selected month/year to the receipt's date so the user immediately sees the added entry
+            if (dateVal && dateVal.includes('-')) {
+                const parts = dateVal.split('-');
+                const rYear = parseInt(parts[0], 10);
+                const rMonth = parseInt(parts[1], 10) - 1;
+                if (!isNaN(rYear) && !isNaN(rMonth)) {
+                    currentState.selectedYear = rYear;
+                    currentState.selectedMonth = rMonth;
+                    populateYearSelect();
+                }
+            }
+
+            if (currentReceiptImportMode === 'items' && currentDetectedLineItems.length > 0) {
+                const checkboxes = document.querySelectorAll('.scanned-item-checkbox:checked');
+                let addedCount = 0;
+                checkboxes.forEach(cb => {
+                    const idx = parseInt(cb.getAttribute('data-item-idx'), 10);
+                    const item = currentDetectedLineItems[idx];
+                    if (item && item.price > 0) {
+                        currentState.items.push({
+                            id: 'scan-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                            categoryId,
+                            name: item.name,
+                            amount: parseFloat(item.price),
+                            sign: 'minus',
+                            mode: 'once',
+                            onceDate: dateVal,
+                            startDate: '',
+                            endDate: '',
+                            note: 'Zeskanowano z paragonu'
+                        });
+                        addedCount++;
+                    }
+                });
+                if (addedCount === 0) {
+                    showToast('Zaznacz przynajmniej jeden produkt z listy', 'error');
+                    return;
+                }
+                closeReceiptScannerModal();
+                switchTab('tables');
+                renderAll();
+                showToast(`Dodano ${addedCount} pozycji z paragonu!`, 'success');
+                return;
+            }
+
+            // Single total receipt mode
+            const amount = parseFloat(document.getElementById('scannedAmountInput').value);
+            const name = document.getElementById('scannedNameInput').value.trim() || 'Zakupy z paragonu';
+
+            if (isNaN(amount) || amount <= 0) {
+                showToast('Wpisz prawidłową kwotę z paragonu większą od 0', 'error');
+                return;
+            }
+
+            currentState.items.push({
+                id: 'scan-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                categoryId,
+                name,
+                amount,
+                sign: 'minus',
+                mode: 'once',
+                onceDate: dateVal,
+                startDate: '',
+                endDate: '',
+                note: 'Zeskanowano aparatem z paragonu'
+            });
+
+            closeReceiptScannerModal();
+            switchTab('tables');
+            renderAll();
+            showToast(`Dodano paragon: ${name} (-${formatPLN(amount)})`, 'success');
+        }
+
+        // Initialize App on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            populateYearSelect();
+            initPWAFeatures();
+            renderAll();
+        });
+    </script>
+</body>
+</html>
